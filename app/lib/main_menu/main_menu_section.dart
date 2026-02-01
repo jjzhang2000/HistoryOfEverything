@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:timeline/main_menu/menu_data.dart';
-import "package:flare_flutter/flare_actor.dart" as flare;
+// TODO: Replace with Rive or other animation library
+// import "package:flare_flutter/flare_actor.dart" as flare;
 import 'package:timeline/main_menu/menu_vignette.dart';
 
 typedef NavigateTo(MenuItemData item);
@@ -19,13 +20,13 @@ class MenuSection extends StatefulWidget {
   final Color backgroundColor;
   final Color accentColor;
   final List<MenuItemData> menuOptions;
-  final String assetId;
+  final String? assetId;
   final NavigateTo navigateTo;
   final bool isActive;
 
   MenuSection(this.title, this.backgroundColor, this.accentColor,
       this.menuOptions, this.navigateTo, this.isActive,
-      {this.assetId, Key key})
+      {this.assetId, Key? key})
       : super(key: key);
 
   @override
@@ -38,7 +39,7 @@ class _SectionState extends State<MenuSection>
     with SingleTickerProviderStateMixin {
   /// The [AnimationController] is a Flutter Animation object that generates a new value
   /// whenever the hardware is ready to draw a new frame.
-  AnimationController _controller;
+  late AnimationController _controller;
 
   /// Since the above object interpolates only between 0 and 1, but we'd rather apply a curve to the current
   /// animation, we're providing a custom [Tween] that allows to build more advanced animations, as seen in [initState()].
@@ -48,7 +49,7 @@ class _SectionState extends State<MenuSection>
   );
 
   /// The [Animation] object itself, which is required by the [SizeTransition] widget in the [build()] method.
-  Animation<double> _sizeAnimation;
+  late Animation<double> _sizeAnimation;
 
   /// Detects which state the widget is currently in, and triggers the animation upon change.
   bool _isExpanded = false;
@@ -126,7 +127,7 @@ class _SectionState extends State<MenuSection>
                         child: MenuVignette(
                             gradientColor: widget.backgroundColor,
                             isActive: widget.isActive,
-                            assetId: widget.assetId)),
+                            assetId: widget.assetId ?? '')),
                     Column(children: <Widget>[
                       Container(
                           height: 150.0,
@@ -139,13 +140,17 @@ class _SectionState extends State<MenuSection>
                                 width: 21.0,
                                 margin: EdgeInsets.all(18.0),
 
+                                /// TODO: Replace with Rive or other animation widget
                                 /// Another [FlareActor] widget that
                                 /// you can experiment with here: https://www.2dimensions.com/a/pollux/files/flare/expandcollapse/preview
-                                child: flare.FlareActor(
-                                    "assets/ExpandCollapse.flr",
-                                    color: widget.accentColor,
-                                    animation:
-                                        _isExpanded ? "Collapse" : "Expand"),
+                                child: Container(
+                                    width: 21.0,
+                                    height: 21.0,
+                                    child: Icon(
+                                      _isExpanded ? Icons.expand_less : Icons.expand_more,
+                                      color: widget.accentColor,
+                                    )
+                                ),
                               ),
                               Text(
                                 widget.title,
@@ -178,7 +183,7 @@ class _SectionState extends State<MenuSection>
                                                       margin: EdgeInsets.only(
                                                           bottom: 20.0),
                                                       child: Text(
-                                                        item.label,
+                                                        item.label!,
                                                         style: TextStyle(
                                                             color: widget
                                                                 .accentColor,

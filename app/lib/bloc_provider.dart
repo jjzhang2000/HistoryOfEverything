@@ -1,4 +1,4 @@
-import "package:flutter/widgets.dart";
+import 'package:flutter/widgets.dart';
 import "package:timeline/blocs/favorites_bloc.dart";
 import 'package:timeline/search_manager.dart';
 import 'package:timeline/timeline/timeline.dart';
@@ -16,10 +16,10 @@ class BlocProvider extends InheritedWidget {
   /// Once those entries have been loaded, load also all the favorites.
   /// Lastly use the entries' references to load a local dictionary for the [SearchManager].
   BlocProvider(
-      {Key key,
-      FavoritesBloc fb,
-      Timeline t,
-      @required Widget child,
+      {Key? key,
+      FavoritesBloc? fb,
+      Timeline? t,
+      required Widget child,
       TargetPlatform platform = TargetPlatform.iOS})
       : timeline = t ?? Timeline(platform),
         favoritesBloc = fb ?? FavoritesBloc(),
@@ -27,9 +27,10 @@ class BlocProvider extends InheritedWidget {
     timeline
         .loadFromBundle("assets/timeline.json")
         .then((List<TimelineEntry> entries) {
+      if (entries.isEmpty) return;
       timeline.setViewport(
-          start: entries.first.start * 2.0,
-          end: entries.first.start,
+          start: entries.first.start! * 2.0,
+          end: entries.first.start!,
           animate: true);
       /// Advance the timeline to its starting position.
       timeline.advance(0.0, false);
@@ -46,19 +47,17 @@ class BlocProvider extends InheritedWidget {
 
   /// static accessor for the [FavoritesBloc]. 
   /// e.g. [ArticleWidget] retrieves the favorites information using this static getter.
-  static FavoritesBloc favorites(BuildContext context) {
-    BlocProvider bp =
-        (context.inheritFromWidgetOfExactType(BlocProvider) as BlocProvider);
-    FavoritesBloc bloc = bp?.favoritesBloc;
-    return bloc;
+  static FavoritesBloc? favorites(BuildContext context) {
+    BlocProvider? bp =
+        context.dependOnInheritedWidgetOfExactType<BlocProvider>();
+    return bp?.favoritesBloc;
   }
 
   /// static accessor for the [Timeline]. 
   /// e.g. [_MainMenuWidgetState.navigateToTimeline] uses this static getter to access build the [TimelineWidget].
-  static Timeline getTimeline(BuildContext context) {
-    BlocProvider bp =
-        (context.inheritFromWidgetOfExactType(BlocProvider) as BlocProvider);
-    Timeline bloc = bp?.timeline;
-    return bloc;
+  static Timeline? getTimeline(BuildContext context) {
+    BlocProvider? bp =
+        context.dependOnInheritedWidgetOfExactType<BlocProvider>();
+    return bp?.timeline;
   }
 }

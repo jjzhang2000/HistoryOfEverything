@@ -1,38 +1,39 @@
 import 'dart:ui' as ui;
 import 'dart:ui';
 
-import 'package:flare_flutter/flare.dart' as flare;
-import 'package:flare_dart/animation/actor_animation.dart' as flare;
-import 'package:flare_dart/math/aabb.dart' as flare;
-import 'package:flare_dart/math/vec2d.dart' as flare;
-import 'package:nima/nima.dart' as nima;
-import 'package:nima/nima/animation/actor_animation.dart' as nima;
-import 'package:nima/nima/math/aabb.dart' as nima;
+// Flare/Nima imports commented out for null safety migration
+// import 'package:flare_flutter/flare.dart' as flare;
+// import 'package:flare_dart/animation/actor_animation.dart' as flare;
+// import 'package:flare_dart/math/aabb.dart' as flare;
+// import 'package:flare_dart/math/vec2d.dart' as flare;
+// import 'package:nima/nima.dart' as nima;
+// import 'package:nima/nima/animation/actor_animation.dart' as nima;
+// import 'package:nima/nima/math/aabb.dart' as nima;
 
 /// An object representing the renderable assets loaded from `timeline.json`.
 /// 
 /// Each [TimelineAsset] encapsulates all the relevant properties for drawing,
 /// as well as maintaining a reference to its original [TimelineEntry].
 class TimelineAsset {
-  double width;
-  double height;
+  double width = 0.0;
+  double height = 0.0;
   double opacity = 0.0;
   double scale = 0.0;
   double scaleVelocity = 0.0;
   double y = 0.0;
   double velocity = 0.0;
-  String filename;
-  TimelineEntry entry;
+  String? filename;
+  TimelineEntry? entry;
 }
 
 /// A renderable image.
 class TimelineImage extends TimelineAsset {
-  ui.Image image;
+  ui.Image? image;
 }
 
 /// This asset also has information regarding its animations.
 class TimelineAnimatedAsset extends TimelineAsset {
-  bool loop;
+  bool loop = true;
   double animationTime = 0.0;
   double offset = 0.0;
   double gap = 0.0;
@@ -40,28 +41,40 @@ class TimelineAnimatedAsset extends TimelineAsset {
 
 /// An `Nima` Asset.
 class TimelineNima extends TimelineAnimatedAsset {
-  nima.FlutterActor actorStatic;
-  nima.FlutterActor actor;
-  nima.ActorAnimation animation;
-  nima.AABB setupAABB;
+  // Nima fields commented out for null safety migration
+  // nima.FlutterActor? actorStatic;
+  // nima.FlutterActor? actor;
+  // nima.ActorAnimation? animation;
+  // nima.AABB? setupAABB;
+  dynamic actorStatic;
+  dynamic actor;
+  dynamic animation;
+  dynamic setupAABB;
 }
 
 /// A `Flare` Asset.
 class TimelineFlare extends TimelineAnimatedAsset {
-  flare.FlutterActorArtboard actorStatic;
-  flare.FlutterActorArtboard actor;
-  flare.ActorAnimation animation;
+  // Flare fields commented out for null safety migration
+  // flare.FlutterActorArtboard? actorStatic;
+  // flare.FlutterActorArtboard? actor;
+  // flare.ActorAnimation? animation;
+  dynamic actorStatic;
+  dynamic actor;
+  dynamic animation;
 
   /// Some Flare assets will have multiple idle animations (e.g. 'Humans'),
   /// others will have an intro&idle animation (e.g. 'Sun is Born'). 
   /// All this information is in `timeline.json` file, and it's de-serialized in the
   /// [Timeline.loadFromBundle()] method, called during startup.
   /// and custom-computed AABB bounds to properly position them in the timeline.
-  flare.ActorAnimation intro;
-  flare.ActorAnimation idle;
-  List<flare.ActorAnimation> idleAnimations;
-  flare.AABB setupAABB;
-
+  // flare.ActorAnimation? intro;
+  // flare.ActorAnimation? idle;
+  // List<flare.ActorAnimation>? idleAnimations;
+  // flare.AABB? setupAABB;
+  dynamic intro;
+  dynamic idle;
+  List<dynamic>? idleAnimations;
+  dynamic setupAABB;
 }
 
 /// A label for [TimelineEntry].
@@ -73,30 +86,30 @@ enum TimelineEntryType { Era, Incident }
 /// 
 /// They are all initialized at startup time by the [BlocProvider] constructor.
 class TimelineEntry {
-  TimelineEntryType type;
+  TimelineEntryType? type;
 
   /// Used to calculate how many lines to draw for the bubble in the timeline.
   int lineCount = 1;
   /// 
-  String _label;
-  String articleFilename;
-  String id;
+  String? _label;
+  String? articleFilename;
+  String? id;
 
-  Color accent;
+  Color? accent;
 
   /// Each entry constitues an element of a tree: 
   /// eras are grouped into spanning eras and events are placed into the eras they belong to.
-  TimelineEntry parent;
-  List<TimelineEntry> children;
+  TimelineEntry? parent;
+  List<TimelineEntry>? children;
   /// All the timeline entries are also linked together to easily access the next/previous event.
   /// After a couple of seconds of inactivity on the timeline, a previous/next entry button will appear
   /// to allow the user to navigate faster between adjacent events.
-  TimelineEntry next;
-  TimelineEntry previous;
+  TimelineEntry? next;
+  TimelineEntry? previous;
 
   /// All these parameters are used by the [Timeline] object to properly position the current entry.
-  double start;
-  double end;
+  double? start;
+  double? end;
   double y = 0.0;
   double endY = 0.0;
   double length = 0.0;
@@ -112,13 +125,13 @@ class TimelineEntry {
   double favoriteY = 0.0;
   bool isFavoriteOccluded = false;
 
-  TimelineAsset asset;
+  TimelineAsset? asset;
 
   bool get isVisible {
     return opacity > 0.0;
   }
 
-  String get label => _label;
+  String get label => _label ?? '';
   /// Some labels already have newline characters to adjust their alignment.
   /// Detect the occurrence and add information regarding the line-count.
   set label(String value) {
@@ -126,7 +139,7 @@ class TimelineEntry {
     int start = 0;
     lineCount = 1;
     while (true) {
-      start = _label.indexOf("\n", start);
+      start = _label!.indexOf("\n", start);
       if (start == -1) {
         break;
       }
@@ -137,8 +150,11 @@ class TimelineEntry {
 
   /// Pretty-printing for the entry date.
   String formatYearsAgo() {
-    if (start > 0) {
-      return start.round().toString();
+    if (start != null && start! > 0) {
+      return start!.round().toString();
+    }
+    if (start == null) {
+      return "Unknown Ago";
     }
     return TimelineEntry.formatYears(start) + " Ago";
   }
@@ -150,26 +166,21 @@ class TimelineEntry {
   }
 
   /// Helper method.
-  static String formatYears(double start) {
+  static String formatYears(double? start) {
+    if (start == null) return "Unknown";
     String label;
     int valueAbs = start.round().abs();
-    if (valueAbs > 1000000000) {
-      double v = (valueAbs / 100000000.0).floorToDouble() / 10.0;
+    if (valueAbs >= 1000000000) {
+      double v = valueAbs / 1000000000.0;
 
-      label = (valueAbs / 1000000000)
-              .toStringAsFixed(v == v.floorToDouble() ? 0 : 1) +
-          " Billion";
-    } else if (valueAbs > 1000000) {
-      double v = (valueAbs / 100000.0).floorToDouble() / 10.0;
-      label =
-          (valueAbs / 1000000).toStringAsFixed(v == v.floorToDouble() ? 0 : 1) +
-              " Million";
-    } else if (valueAbs > 10000) // N.B. < 10,000
+      label = v.toStringAsFixed(v == v.floorToDouble() ? 0 : 1) + " Billion";
+    } else if (valueAbs >= 1000000) {
+      double v = valueAbs / 1000000.0;
+      label = v.toStringAsFixed(v == v.floorToDouble() ? 0 : 1) + " Million";
+    } else if (valueAbs >= 10000) // N.B. < 10,000
     {
-      double v = (valueAbs / 100.0).floorToDouble() / 10.0;
-      label =
-          (valueAbs / 1000).toStringAsFixed(v == v.floorToDouble() ? 0 : 1) +
-              " Thousand";
+      double v = valueAbs / 1000.0;
+      label = v.toStringAsFixed(v == v.floorToDouble() ? 0 : 0) + " Thousand";
     } else {
       label = valueAbs.toStringAsFixed(0);
     }

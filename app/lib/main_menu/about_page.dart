@@ -12,12 +12,11 @@ import 'package:url_launcher/url_launcher.dart';
 /// to open up urls in a WebView on both iOS & Android.
 class AboutPage extends StatelessWidget {
   /// Sanity check before opening up the url.
-  _launchUrl(String url) {
-    canLaunch(url).then((bool success) {
-      if (success) {
-        launch(url);
-      }
-    });
+  _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   @override
@@ -26,13 +25,13 @@ class AboutPage extends StatelessWidget {
         appBar: AppBar(
           centerTitle: false,
           backgroundColor: lightGrey,
-          iconTheme: IconThemeData(color: Colors.black.withOpacity(0.54)),
+          iconTheme: IconThemeData(color: Colors.black.withValues(alpha: 0.54)),
           elevation: 0.0,
           leading: IconButton(
             alignment: Alignment.centerLeft,
             icon: Icon(Icons.arrow_back),
             padding: EdgeInsets.only(left: 20.0, right: 20.0),
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             onPressed: () {
               Navigator.pop(context, true);
             },
@@ -44,7 +43,7 @@ class AboutPage extends StatelessWidget {
               style: TextStyle(
                   fontFamily: "RobotoMedium",
                   fontSize: 20.0,
-                  color: darkText.withOpacity(darkText.opacity * 0.75))),
+                  color: darkText.withValues(alpha: darkText.a * 0.75))),
         ),
         body: Padding(
           padding: EdgeInsets.only(top: 30, bottom: 20, left: 20, right: 20),
@@ -56,7 +55,7 @@ class AboutPage extends StatelessWidget {
                 style: TextStyle(
                     fontFamily: "RobotoMedium",
                     fontSize: 34.0,
-                    color: darkText.withOpacity(darkText.opacity * 0.75)),
+                    color: darkText.withValues(alpha: darkText.a * 0.75)),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0, bottom: 14.0),
@@ -66,7 +65,7 @@ class AboutPage extends StatelessWidget {
                       fontFamily: "Roboto",
                       fontSize: 17.0,
                       height: 1.5,
-                      color: darkText.withOpacity(darkText.opacity * 0.5)),
+                      color: darkText.withValues(alpha: darkText.a * 0.5)),
                 ),
               ),
               Expanded(
@@ -75,7 +74,7 @@ class AboutPage extends StatelessWidget {
                     text: TextSpan(
                         style: TextStyle(
                             color:
-                                darkText.withOpacity(darkText.opacity * 0.75),
+                                darkText.withValues(alpha: darkText.a * 0.75),
                             fontFamily: "Roboto",
                             fontSize: 17.0,
                             height: 1.5),
@@ -136,7 +135,7 @@ class AboutPage extends StatelessWidget {
                     fontFamily: "Roboto",
                     fontSize: 17.0,
                     height: 1.5,
-                    color: Colors.black.withOpacity(0.5)),
+                    color: Colors.black.withValues(alpha: 0.5)),
               ),
               GestureDetector(
                 onTap: () => _launchUrl("https://www.2dimensions.com"),
@@ -153,7 +152,7 @@ class AboutPage extends StatelessWidget {
                     fontFamily: "Roboto",
                     fontSize: 17.0,
                     height: 1.5,
-                    color: Colors.black.withOpacity(0.5)),
+                    color: Colors.black.withValues(alpha: 0.5)),
               ),
               GestureDetector(
                 onTap: () => _launchUrl("https://www.flutter.io"),
@@ -171,7 +170,7 @@ class AboutPage extends StatelessWidget {
                               style: TextStyle(
                                   fontSize: 26.0,
                                   color: darkText
-                                      .withOpacity(darkText.opacity * 0.6)),
+                                      .withValues(alpha: darkText.a * 0.6)),
                             ),
                           )
                         ])),

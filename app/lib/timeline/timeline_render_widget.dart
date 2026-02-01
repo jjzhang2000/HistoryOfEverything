@@ -2,13 +2,14 @@ import 'dart:math';
 import 'dart:ui';
 import 'dart:ui' as ui;
 
-import 'package:flare_dart/actor_image.dart' as flare;
-import 'package:flare_dart/math/aabb.dart' as flare;
+// Flare/Nima imports commented out for null safety migration
+// import 'package:flare_dart/actor_image.dart' as flare;
+// import 'package:flare_dart/math/aabb.dart' as flare;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
-import 'package:nima/nima/actor_image.dart' as nima;
-import 'package:nima/nima/math/aabb.dart' as nima;
+// import 'package:nima/nima/actor_image.dart' as nima;
+// import 'package:nima/nima/math/aabb.dart' as nima;
 import 'package:timeline/colors.dart';
 import 'package:timeline/main_menu/menu_data.dart';
 import 'package:timeline/timeline/ticks.dart';
@@ -18,23 +19,23 @@ import 'package:timeline/timeline/timeline_utils.dart';
 
 /// These two callbacks are used to detect if a bubble or an entry have been tapped.
 /// If that's the case, [ArticlePage] will be pushed onto the [Navigator] stack.
-typedef TouchBubbleCallback(TapTarget bubble);
-typedef TouchEntryCallback(TimelineEntry entry);
+typedef TouchBubbleCallback = void Function(TapTarget? bubble);
+typedef TouchEntryCallback = void Function(TimelineEntry? entry);
 
 /// This couples with [TimelineRenderObject].
 ///
 /// This widget's fields are accessible from the [RenderBox] so that it can
 /// be aligned with the current state.
 class TimelineRenderWidget extends LeafRenderObjectWidget {
-  final double topOverlap;
-  final Timeline timeline;
-  final MenuItemData focusItem;
-  final List<TimelineEntry> favorites;
-  final TouchBubbleCallback touchBubble;
-  final TouchEntryCallback touchEntry;
+  final double? topOverlap;
+  final Timeline? timeline;
+  final MenuItemData? focusItem;
+  final List<TimelineEntry>? favorites;
+  final TouchBubbleCallback? touchBubble;
+  final TouchEntryCallback? touchEntry;
 
   TimelineRenderWidget(
-      {Key key,
+      {Key? key,
       this.focusItem,
       this.touchBubble,
       this.touchEntry,
@@ -68,7 +69,7 @@ class TimelineRenderWidget extends LeafRenderObjectWidget {
 
   @override
   didUnmountRenderObject(covariant TimelineRenderObject renderObject) {
-    renderObject.timeline.isActive = false;
+    renderObject.timeline?.isActive = false;
   }
 }
 
@@ -88,23 +89,24 @@ class TimelineRenderObject extends RenderBox {
 
   double _topOverlap = 0.0;
   Ticks _ticks = Ticks();
-  Timeline _timeline;
-  MenuItemData _focusItem;
-  MenuItemData _processedFocusItem;
-  List<TapTarget> _tapTargets = List<TapTarget>();
-  List<TimelineEntry> _favorites;
-  TouchBubbleCallback touchBubble;
-  TouchEntryCallback touchEntry;
+  Timeline? _timeline;
+  MenuItemData? _focusItem;
+  MenuItemData? _processedFocusItem;
+  List<TapTarget> _tapTargets = <TapTarget>[];
+  List<TimelineEntry>? _favorites;
+  TouchBubbleCallback? touchBubble;
+  TouchEntryCallback? touchEntry;
 
   @override
   bool get sizedByParent => true;
 
   double get topOverlap => _topOverlap;
-  Timeline get timeline => _timeline;
-  List<TimelineEntry> get favorites => _favorites;
-  MenuItemData get focusItem => _focusItem;
+  Timeline? get timeline => _timeline;
+  List<TimelineEntry>? get favorites => _favorites;
+  MenuItemData? get focusItem => _focusItem;
 
-  set topOverlap(double value) {
+  set topOverlap(double? value) {
+    if (value == null) return;
     if (_topOverlap == value) {
       return;
     }
@@ -114,18 +116,18 @@ class TimelineRenderObject extends RenderBox {
     markNeedsLayout();
   }
 
-  set timeline(Timeline value) {
+  set timeline(Timeline? value) {
     if (_timeline == value) {
       return;
     }
     _timeline = value;
     updateFocusItem();
-    _timeline.onNeedPaint = markNeedsPaint;
+    _timeline?.onNeedPaint = markNeedsPaint;
     markNeedsPaint();
     markNeedsLayout();
   }
 
-  set favorites(List<TimelineEntry> value) {
+  set favorites(List<TimelineEntry>? value) {
     if (_favorites == value) {
       return;
     }
@@ -134,7 +136,7 @@ class TimelineRenderObject extends RenderBox {
     markNeedsLayout();
   }
 
-  set focusItem(MenuItemData value) {
+  set focusItem(MenuItemData? value) {
     if (_focusItem == value) {
       return;
     }
@@ -153,19 +155,19 @@ class TimelineRenderObject extends RenderBox {
     }
 
     /// Adjust the current timeline padding and consequentely the viewport.
-    if (_focusItem.pad) {
-      timeline.padding = EdgeInsets.only(
-          top: topOverlap + _focusItem.padTop + Timeline.Parallax,
-          bottom: _focusItem.padBottom);
-      timeline.setViewport(
-          start: _focusItem.start,
-          end: _focusItem.end,
+    if (_focusItem!.pad) {
+      timeline!.padding = EdgeInsets.only(
+          top: topOverlap + _focusItem!.padTop + Timeline.Parallax,
+          bottom: _focusItem!.padBottom);
+      timeline!.setViewport(
+          start: _focusItem!.start!,
+          end: _focusItem!.end!,
           animate: true,
           pad: true);
     } else {
-      timeline.padding = EdgeInsets.zero;
-      timeline.setViewport(
-          start: _focusItem.start, end: _focusItem.end, animate: true);
+      timeline!.padding = EdgeInsets.zero;
+      timeline!.setViewport(
+          start: _focusItem!.start!, end: _focusItem!.end!, animate: true);
     }
     _processedFocusItem = _focusItem;
   }
@@ -173,16 +175,14 @@ class TimelineRenderObject extends RenderBox {
   /// Check if the current tap on the screen has hit a bubble.
   @override
   bool hitTestSelf(Offset screenOffset) {
-    touchEntry(null);
+    touchEntry?.call(null);
     for (TapTarget bubble in _tapTargets.reversed) {
-      if (bubble.rect.contains(screenOffset)) {
-        if (touchBubble != null) {
-          touchBubble(bubble);
-        }
+      if (bubble.rect!.contains(screenOffset)) {
+        touchBubble?.call(bubble);
         return true;
       }
     }
-    touchBubble(null);
+    touchBubble?.call(null);
 
     return true;
   }
@@ -195,9 +195,7 @@ class TimelineRenderObject extends RenderBox {
   /// Adjust the viewport when needed.
   @override
   void performLayout() {
-    if (_timeline != null) {
-      _timeline.setViewport(height: size.height, animate: true);
-    }
+    _timeline?.setViewport(height: size.height, animate: true);
   }
 
   @override
@@ -208,21 +206,23 @@ class TimelineRenderObject extends RenderBox {
     }
 
     /// Fetch the background colors from the [Timeline] and compute the fill.
-    List<TimelineBackgroundColor> backgroundColors = timeline.backgroundColors;
-    ui.Paint backgroundPaint;
-    if (backgroundColors != null && backgroundColors.length > 0) {
+    List<TimelineBackgroundColor> backgroundColors = timeline!.backgroundColors;
+    ui.Paint? backgroundPaint;
+    if (backgroundColors.length > 0) {
       double rangeStart = backgroundColors.first.start;
       double range = backgroundColors.last.start - backgroundColors.first.start;
       List<ui.Color> colors = <ui.Color>[];
       List<double> stops = <double>[];
       for (TimelineBackgroundColor bg in backgroundColors) {
-        colors.add(bg.color);
-        stops.add((bg.start - rangeStart) / range);
+        if (bg.color != null) {
+          colors.add(bg.color!);
+          stops.add((bg.start - rangeStart) / range);
+        }
       }
       double s =
-          timeline.computeScale(timeline.renderStart, timeline.renderEnd);
-      double y1 = (backgroundColors.first.start - timeline.renderStart) * s;
-      double y2 = (backgroundColors.last.start - timeline.renderStart) * s;
+          timeline!.computeScale(timeline!.renderStart, timeline!.renderEnd);
+      double y1 = (backgroundColors.first.start - timeline!.renderStart) * s;
+      double y2 = (backgroundColors.last.start - timeline!.renderStart) * s;
 
       /// Fill Background.
       backgroundPaint = ui.Paint()
@@ -234,23 +234,26 @@ class TimelineRenderObject extends RenderBox {
         canvas.drawRect(
             Rect.fromLTWH(
                 offset.dx, offset.dy, size.width, y1 - offset.dy + 1.0),
-            ui.Paint()..color = backgroundColors.first.color);
+            ui.Paint()
+              ..color = backgroundColors.first.color ?? Colors.transparent);
       }
 
       /// Draw the background on the canvas.
-      canvas.drawRect(
-          Rect.fromLTWH(offset.dx, y1, size.width, y2 - y1), backgroundPaint);
+      if (backgroundPaint != null) {
+        canvas.drawRect(
+            Rect.fromLTWH(offset.dx, y1, size.width, y2 - y1), backgroundPaint);
+      }
     }
 
     _tapTargets.clear();
-    double renderStart = _timeline.renderStart;
-    double renderEnd = _timeline.renderEnd;
+    double renderStart = _timeline!.renderStart;
+    double renderEnd = _timeline!.renderEnd;
     double scale = size.height / (renderEnd - renderStart);
 
-    if (timeline.renderAssets != null) {
+    if (timeline!.renderAssets != null) {
       canvas.save();
       canvas.clipRect(offset & size);
-      for (TimelineAsset asset in timeline.renderAssets) {
+      for (TimelineAsset asset in timeline!.renderAssets) {
         if (asset.opacity > 0) {
           double rs = 0.2 + asset.scale * 0.8;
 
@@ -258,199 +261,23 @@ class TimelineRenderObject extends RenderBox {
           double h = asset.height * Timeline.AssetScreenScale;
 
           /// Draw the correct asset.
-          if (asset is TimelineImage) {
+          if (asset is TimelineImage && asset.image != null) {
             canvas.drawImageRect(
-                asset.image,
+                asset.image!,
                 Rect.fromLTWH(0.0, 0.0, asset.width, asset.height),
                 Rect.fromLTWH(
                     offset.dx + size.width - w, asset.y, w * rs, h * rs),
                 Paint()
                   ..isAntiAlias = true
                   ..filterQuality = ui.FilterQuality.low
-                  ..color = Colors.white.withOpacity(asset.opacity));
-          } else if (asset is TimelineNima && asset.actor != null) {
-            /// If we have a [TimelineNima] asset, set it up properly and paint it.
-            ///
-            /// 1. Calculate the bounds for the current object.
-            /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
-            /// We rely on this AABB to perform screen-space calculations.
-            Alignment alignment = Alignment.center;
-            BoxFit fit = BoxFit.cover;
-
-            nima.AABB bounds = asset.setupAABB;
-
-            double contentHeight = bounds[3] - bounds[1];
-            double contentWidth = bounds[2] - bounds[0];
-            double x = -bounds[0] -
-                contentWidth / 2.0 -
-                (alignment.x * contentWidth / 2.0) +
-                asset.offset;
-            double y = -bounds[1] -
-                contentHeight / 2.0 +
-                (alignment.y * contentHeight / 2.0);
-
-            Offset renderOffset = Offset(offset.dx + size.width - w, asset.y);
-            Size renderSize = Size(w * rs, h * rs);
-
-            double scaleX = 1.0, scaleY = 1.0;
-
-            canvas.save();
-
-            /// This widget is always set up to use [BoxFit.cover].
-            /// But this behavior can be customized according to anyone's needs.
-            /// The following switch/case contains all the various alternatives native to Flutter.
-            switch (fit) {
-              case BoxFit.fill:
-                scaleX = renderSize.width / contentWidth;
-                scaleY = renderSize.height / contentHeight;
-                break;
-              case BoxFit.contain:
-                double minScale = min(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.cover:
-                double maxScale = max(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = maxScale;
-                break;
-              case BoxFit.fitHeight:
-                double minScale = renderSize.height / contentHeight;
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.fitWidth:
-                double minScale = renderSize.width / contentWidth;
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.none:
-                scaleX = scaleY = 1.0;
-                break;
-              case BoxFit.scaleDown:
-                double minScale = min(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-                break;
-            }
-
-            /// 2. Move the [canvas] to the right position so that the widget's position
-            /// is center-aligned based on its offset, size and alignment position.
-            canvas.translate(
-                renderOffset.dx +
-                    renderSize.width / 2.0 +
-                    (alignment.x * renderSize.width / 2.0),
-                renderOffset.dy +
-                    renderSize.height / 2.0 +
-                    (alignment.y * renderSize.height / 2.0));
-
-            /// 3. Scale depending on the [fit].
-            canvas.scale(scaleX, -scaleY);
-
-            /// 4. Move the canvas to the correct [_nimaActor] position calculated above.
-            canvas.translate(x, y);
-
-            /// 5. perform the drawing operations.
-            asset.actor.draw(canvas, asset.opacity);
-
-            /// 6. Restore the canvas' original transform state.
-            canvas.restore();
-
-            /// 7. This asset is also a *tappable* element, add it to the list
-            /// so it can be processed.
-            _tapTargets.add(TapTarget()
-              ..entry = asset.entry
-              ..rect = renderOffset & renderSize);
-          } else if (asset is TimelineFlare && asset.actor != null) {
-            /// If we have a [TimelineFlare] asset set it up properly and paint it.
-            ///
-            /// 1. Calculate the bounds for the current object.
-            /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
-            /// We rely on this AABB to perform screen-space calculations.
-            Alignment alignment = Alignment.center;
-            BoxFit fit = BoxFit.cover;
-
-            flare.AABB bounds = asset.setupAABB;
-            double contentWidth = bounds[2] - bounds[0];
-            double contentHeight = bounds[3] - bounds[1];
-            double x = -bounds[0] -
-                contentWidth / 2.0 -
-                (alignment.x * contentWidth / 2.0) +
-                asset.offset;
-            double y = -bounds[1] -
-                contentHeight / 2.0 +
-                (alignment.y * contentHeight / 2.0);
-
-            Offset renderOffset = Offset(offset.dx + size.width - w, asset.y);
-            Size renderSize = Size(w * rs, h * rs);
-
-            double scaleX = 1.0, scaleY = 1.0;
-
-            canvas.save();
-
-            /// This widget is always set up to use [BoxFit.cover].
-            /// But this behavior can be customized according to anyone's needs.
-            /// The following switch/case contains all the various alternatives native to Flutter.
-            switch (fit) {
-              case BoxFit.fill:
-                scaleX = renderSize.width / contentWidth;
-                scaleY = renderSize.height / contentHeight;
-                break;
-              case BoxFit.contain:
-                double minScale = min(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.cover:
-                double maxScale = max(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = maxScale;
-                break;
-              case BoxFit.fitHeight:
-                double minScale = renderSize.height / contentHeight;
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.fitWidth:
-                double minScale = renderSize.width / contentWidth;
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.none:
-                scaleX = scaleY = 1.0;
-                break;
-              case BoxFit.scaleDown:
-                double minScale = min(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-                break;
-            }
-
-            /// 2. Move the [canvas] to the right position so that the widget's position
-            /// is center-aligned based on its offset, size and alignment position.
-            canvas.translate(
-                renderOffset.dx +
-                    renderSize.width / 2.0 +
-                    (alignment.x * renderSize.width / 2.0),
-                renderOffset.dy +
-                    renderSize.height / 2.0 +
-                    (alignment.y * renderSize.height / 2.0));
-
-            /// 3. Scale depending on the [fit].
-            canvas.scale(scaleX, scaleY);
-
-            /// 4. Move the canvas to the correct [_flareActor] position calculated above.
-            canvas.translate(x, y);
-
-            /// 5. perform the drawing operations.
-            asset.actor.modulateOpacity = asset.opacity;
-            asset.actor.draw(canvas);
-
-            /// 6. Restore the canvas' original transform state.
-            canvas.restore();
-
-            /// 7. This asset is also a *tappable* element, add it to the list
-            /// so it can be processed.
-            _tapTargets.add(TapTarget()
-              ..entry = asset.entry
-              ..rect = renderOffset & renderSize);
+                  ..color = Colors.white.withValues(alpha: asset.opacity));
           }
+          // Nima/Flare rendering commented out for null safety migration
+          // } else if (asset is TimelineNima && asset.actor != null) {
+          //   // Nima rendering logic...
+          // } else if (asset is TimelineFlare && asset.actor != null) {
+          //   // Flare rendering logic...
+          // }
         }
       }
       canvas.restore();
@@ -461,21 +288,21 @@ class TimelineRenderObject extends RenderBox {
     canvas.clipRect(Rect.fromLTWH(
         offset.dx, offset.dy + topOverlap, size.width, size.height));
     _ticks.paint(
-        context, offset, -renderStart * scale, scale, size.height, timeline);
+        context, offset, -renderStart * scale, scale, size.height, timeline!);
     canvas.restore();
 
     /// And then draw the rest of the timeline.
-    if (_timeline.entries != null) {
+    if (_timeline!.entries.isNotEmpty) {
       canvas.save();
-      canvas.clipRect(Rect.fromLTWH(offset.dx + _timeline.gutterWidth,
-          offset.dy, size.width - _timeline.gutterWidth, size.height));
+      canvas.clipRect(Rect.fromLTWH(offset.dx + _timeline!.gutterWidth,
+          offset.dy, size.width - _timeline!.gutterWidth, size.height));
       drawItems(
           context,
           offset,
-          _timeline.entries,
-          _timeline.gutterWidth +
+          _timeline!.entries,
+          _timeline!.gutterWidth +
               Timeline.LineSpacing -
-              Timeline.DepthOffset * _timeline.renderOffsetDepth,
+              Timeline.DepthOffset * _timeline!.renderOffsetDepth,
           scale,
           0);
       canvas.restore();
@@ -484,12 +311,12 @@ class TimelineRenderObject extends RenderBox {
     /// After a few moments of inaction on the timeline, if there's enough space,
     /// an arrow pointing to the next event on the timeline will appear on the bottom of the screen.
     /// Draw it, and add it as another [TapTarget].
-    if (_timeline.nextEntry != null && _timeline.nextEntryOpacity > 0.0) {
-      double x = offset.dx + _timeline.gutterWidth - Timeline.GutterLeft;
-      double opacity = _timeline.nextEntryOpacity;
+    if (_timeline!.nextEntry != null && _timeline!.nextEntryOpacity > 0.0) {
+      double x = offset.dx + _timeline!.gutterWidth - Timeline.GutterLeft;
+      double opacity = _timeline!.nextEntryOpacity;
       Color color = Color.fromRGBO(69, 211, 197, opacity);
-      double pageSize = (_timeline.renderEnd - _timeline.renderStart);
-      double pageReference = _timeline.renderEnd;
+      double pageSize = (_timeline!.renderEnd - _timeline!.renderStart);
+      double pageReference = _timeline!.renderEnd;
 
       /// Use a Paragraph to draw the arrow's label and page scrolls on canvas:
       /// 1. Create a [ParagraphBuilder] that'll be initialized with the correct styling information;
@@ -502,7 +329,7 @@ class TimelineRenderObject extends RenderBox {
           textAlign: TextAlign.start, fontFamily: "Roboto", fontSize: 20.0))
         ..pushStyle(ui.TextStyle(color: color));
 
-      builder.addText(_timeline.nextEntry.label);
+      builder.addText(_timeline!.nextEntry!.label);
       ui.Paragraph labelParagraph = builder.build();
       labelParagraph.layout(ui.ParagraphConstraints(width: MaxLabelWidth));
 
@@ -542,7 +369,7 @@ class TimelineRenderObject extends RenderBox {
       canvas.drawPath(
           path,
           Paint()
-            ..color = Colors.white.withOpacity(opacity)
+            ..color = Colors.white.withValues(alpha: opacity)
             ..style = PaintingStyle.stroke
             ..strokeWidth = 2.0);
       y += 15 + radius;
@@ -554,7 +381,7 @@ class TimelineRenderObject extends RenderBox {
           height: 1.3))
         ..pushStyle(ui.TextStyle(color: color));
 
-      double timeUntil = _timeline.nextEntry.start - pageReference;
+      double timeUntil = _timeline!.nextEntry!.start! - pageReference;
       double pages = timeUntil / pageSize;
       NumberFormat formatter = NumberFormat.compact();
       String pagesFormatted = formatter.format(pages);
@@ -571,25 +398,25 @@ class TimelineRenderObject extends RenderBox {
 
       /// Add this to the list of *tappable* elements.
       _tapTargets.add(TapTarget()
-        ..entry = _timeline.nextEntry
+        ..entry = _timeline!.nextEntry
         ..rect = nextEntryRect
         ..zoom = true);
     }
 
     /// Repeat the same procedure as above for the arrow pointing to the previous event on the timeline.
-    if (_timeline.prevEntry != null && _timeline.prevEntryOpacity > 0.0) {
-      double x = offset.dx + _timeline.gutterWidth - Timeline.GutterLeft;
-      double opacity = _timeline.prevEntryOpacity;
+    if (_timeline!.prevEntry != null && _timeline!.prevEntryOpacity > 0.0) {
+      double x = offset.dx + _timeline!.gutterWidth - Timeline.GutterLeft;
+      double opacity = _timeline!.prevEntryOpacity;
       Color color = Color.fromRGBO(69, 211, 197, opacity);
-      double pageSize = (_timeline.renderEnd - _timeline.renderStart);
-      double pageReference = _timeline.renderEnd;
+      double pageSize = (_timeline!.renderEnd - _timeline!.renderStart);
+      double pageReference = _timeline!.renderEnd;
 
       const double MaxLabelWidth = 1200.0;
       ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
           textAlign: TextAlign.start, fontFamily: "Roboto", fontSize: 20.0))
         ..pushStyle(ui.TextStyle(color: color));
 
-      builder.addText(_timeline.prevEntry.label);
+      builder.addText(_timeline!.prevEntry!.label);
       ui.Paragraph labelParagraph = builder.build();
       labelParagraph.layout(ui.ParagraphConstraints(width: MaxLabelWidth));
 
@@ -624,7 +451,7 @@ class TimelineRenderObject extends RenderBox {
       canvas.drawPath(
           path,
           Paint()
-            ..color = Colors.white.withOpacity(opacity)
+            ..color = Colors.white.withValues(alpha: opacity)
             ..style = PaintingStyle.stroke
             ..strokeWidth = 2.0);
       y += 15 + radius;
@@ -636,7 +463,7 @@ class TimelineRenderObject extends RenderBox {
           height: 1.3))
         ..pushStyle(ui.TextStyle(color: color));
 
-      double timeUntil = _timeline.prevEntry.start - pageReference;
+      double timeUntil = _timeline!.prevEntry!.start! - pageReference;
       double pages = timeUntil / pageSize;
       NumberFormat formatter = NumberFormat.compact();
       String pagesFormatted = formatter.format(pages.abs());
@@ -649,7 +476,7 @@ class TimelineRenderObject extends RenderBox {
       y += labelParagraph.height;
 
       _tapTargets.add(TapTarget()
-        ..entry = _timeline.prevEntry
+        ..entry = _timeline!.prevEntry
         ..rect = prevEntryRect
         ..zoom = true);
     }
@@ -658,8 +485,8 @@ class TimelineRenderObject extends RenderBox {
     /// a gutter on the left side shows up so that favorite elements are quickly accessible.
     ///
     /// Here the gutter gets drawn, and the elements are added as *tappable* targets.
-    double favoritesGutter = _timeline.gutterWidth - Timeline.GutterLeft;
-    if (_favorites != null && _favorites.length > 0 && favoritesGutter > 0.0) {
+    double favoritesGutter = _timeline!.gutterWidth - Timeline.GutterLeft;
+    if (_favorites != null && _favorites!.isNotEmpty && favoritesGutter > 0.0) {
       Paint accentPaint = Paint()
         ..color = favoritesGutterAccent
         ..style = PaintingStyle.stroke
@@ -669,7 +496,7 @@ class TimelineRenderObject extends RenderBox {
         ..style = PaintingStyle.fill;
       Paint whitePaint = Paint()..color = Colors.white;
       double scale =
-          timeline.computeScale(timeline.renderStart, timeline.renderEnd);
+          timeline!.computeScale(timeline!.renderStart, timeline!.renderEnd);
       double fullMargin = 50.0;
       double favoritesRadius = 20.0;
       double fullMarginOffset = fullMargin + favoritesRadius + 11.0;
@@ -683,17 +510,17 @@ class TimelineRenderObject extends RenderBox {
 
       /// Order favorites by distance from mid.
       List<TimelineEntry> nearbyFavorites =
-          List<TimelineEntry>.from(_favorites);
-      double mid = timeline.renderStart +
-          (timeline.renderEnd - timeline.renderStart) / 2.0;
+          List<TimelineEntry>.from(_favorites!);
+      double mid = timeline!.renderStart +
+          (timeline!.renderEnd - timeline!.renderStart) / 2.0;
       nearbyFavorites.sort((TimelineEntry a, TimelineEntry b) {
-        return (a.start - mid).abs().compareTo((b.start - mid).abs());
+        return (a.start! - mid).abs().compareTo((b.start! - mid).abs());
       });
 
       /// layout favorites.
       for (int i = 0; i < nearbyFavorites.length; i++) {
         TimelineEntry favorite = nearbyFavorites[i];
-        double y = ((favorite.start - timeline.renderStart) * scale).clamp(
+        double y = ((favorite.start! - timeline!.renderStart) * scale).clamp(
             offset.dy + topOverlap + favoritesRadius + padFavorites,
             offset.dy + size.height - favoritesRadius - padFavorites);
         favorite.favoriteY = y;
@@ -727,165 +554,28 @@ class TimelineRenderObject extends RenderBox {
         canvas.drawCircle(Offset(x, y), favoritesRadius, accentPaint);
         canvas.drawCircle(Offset(x, y), favoritesRadius - 4.0, whitePaint);
 
-        TimelineAsset asset = favorite.asset;
+        TimelineAsset? asset = favorite.asset;
         double assetSize = 40.0 - 8.0;
         Size renderSize = Size(assetSize, assetSize);
         Offset renderOffset = Offset(x - assetSize / 2.0, y - assetSize / 2.0);
 
-        Alignment alignment = Alignment.center;
-        BoxFit fit = BoxFit.cover;
+        // Nima/Flare static rendering commented out for null safety migration
+        // if (asset is TimelineNima && asset.actorStatic != null) { ... }
+        // if (asset is TimelineFlare && asset.actorStatic != null) { ... }
 
-        /// Draw the assets statically within the circle.
-        /// Calculations here are the same as seen in [paint()] for the assets.
-        if (asset is TimelineNima && asset.actorStatic != null) {
-          nima.AABB bounds = asset.setupAABB;
-
-          double contentHeight = bounds[3] - bounds[1];
-          double contentWidth = bounds[2] - bounds[0];
-          double x = -bounds[0] -
-              contentWidth / 2.0 -
-              (alignment.x * contentWidth / 2.0) +
-              asset.offset;
-          double y = -bounds[1] -
-              contentHeight / 2.0 +
-              (alignment.y * contentHeight / 2.0);
-
-          double scaleX = 1.0, scaleY = 1.0;
-
-          canvas.save();
-          canvas.clipRRect(RRect.fromRectAndRadius(
-              renderOffset & renderSize, Radius.circular(favoritesRadius)));
-
-          switch (fit) {
-            case BoxFit.fill:
-              scaleX = renderSize.width / contentWidth;
-              scaleY = renderSize.height / contentHeight;
-              break;
-            case BoxFit.contain:
-              double minScale = min(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.cover:
-              double maxScale = max(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = maxScale;
-              break;
-            case BoxFit.fitHeight:
-              double minScale = renderSize.height / contentHeight;
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.fitWidth:
-              double minScale = renderSize.width / contentWidth;
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.none:
-              scaleX = scaleY = 1.0;
-              break;
-            case BoxFit.scaleDown:
-              double minScale = min(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-              break;
-          }
-
-          canvas.translate(
-              renderOffset.dx +
-                  renderSize.width / 2.0 +
-                  (alignment.x * renderSize.width / 2.0),
-              renderOffset.dy +
-                  renderSize.height / 2.0 +
-                  (alignment.y * renderSize.height / 2.0));
-          canvas.scale(scaleX, -scaleY);
-          canvas.translate(x, y);
-
-          asset.actorStatic.draw(canvas);
-          canvas.restore();
-          _tapTargets.add(TapTarget()
-            ..entry = asset.entry
-            ..rect = renderOffset & renderSize
-            ..zoom = true);
-        } else if (asset is TimelineFlare && asset.actorStatic != null) {
-          flare.AABB bounds = asset.setupAABB;
-          double contentWidth = bounds[2] - bounds[0];
-          double contentHeight = bounds[3] - bounds[1];
-          double x = -bounds[0] -
-              contentWidth / 2.0 -
-              (alignment.x * contentWidth / 2.0) +
-              asset.offset;
-          double y = -bounds[1] -
-              contentHeight / 2.0 +
-              (alignment.y * contentHeight / 2.0);
-
-          double scaleX = 1.0, scaleY = 1.0;
-
-          canvas.save();
-          canvas.clipRRect(RRect.fromRectAndRadius(
-              renderOffset & renderSize, Radius.circular(favoritesRadius)));
-
-          switch (fit) {
-            case BoxFit.fill:
-              scaleX = renderSize.width / contentWidth;
-              scaleY = renderSize.height / contentHeight;
-              break;
-            case BoxFit.contain:
-              double minScale = min(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.cover:
-              double maxScale = max(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = maxScale;
-              break;
-            case BoxFit.fitHeight:
-              double minScale = renderSize.height / contentHeight;
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.fitWidth:
-              double minScale = renderSize.width / contentWidth;
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.none:
-              scaleX = scaleY = 1.0;
-              break;
-            case BoxFit.scaleDown:
-              double minScale = min(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-              break;
-          }
-
-          canvas.translate(
-              renderOffset.dx +
-                  renderSize.width / 2.0 +
-                  (alignment.x * renderSize.width / 2.0),
-              renderOffset.dy +
-                  renderSize.height / 2.0 +
-                  (alignment.y * renderSize.height / 2.0));
-          canvas.scale(scaleX, scaleY);
-          canvas.translate(x, y);
-
-          asset.actorStatic.draw(canvas);
-          canvas.restore();
-          _tapTargets.add(TapTarget()
-            ..entry = asset.entry
-            ..rect = renderOffset & renderSize
-            ..zoom = true);
-        } else {
-          _tapTargets.add(TapTarget()
-            ..entry = favorite
-            ..rect = renderOffset & renderSize
-            ..zoom = true);
-        }
+        // Add tap target for the favorite
+        _tapTargets.add(TapTarget()
+          ..entry = favorite
+          ..rect = renderOffset & renderSize
+          ..zoom = true);
       }
 
       /// If there are two or more favorites in the gutter, show a line connecting
       /// the two circles, with the time between those two favorites as a label within a bubble.
       ///
       /// Uses same [ui.ParagraphBuilder] logic as seen above.
-      TimelineEntry previous;
-      for (TimelineEntry favorite in _favorites) {
+      TimelineEntry? previous;
+      for (TimelineEntry favorite in _favorites!) {
         if (favorite.isFavoriteOccluded) {
           continue;
         }
@@ -905,7 +595,7 @@ class TimelineRenderObject extends RenderBox {
                       fontSize: 10.0))
                 ..pushStyle(ui.TextStyle(color: Colors.white));
 
-              int value = (favorite.start - previous.start).round().abs();
+              int value = (favorite.start! - previous.start!).round().abs();
               String label;
               if (value < 9000) {
                 label = value.toStringAsFixed(0);
@@ -963,15 +653,15 @@ class TimelineRenderObject extends RenderBox {
           Timeline.EdgeRadius,
           Paint()
             ..color = (item.accent != null
-                    ? item.accent
+                    ? item.accent!
                     : LineColors[depth % LineColors.length])
-                .withOpacity(item.opacity));
+                .withValues(alpha: item.opacity));
       if (legOpacity > 0.0) {
         Paint legPaint = Paint()
           ..color = (item.accent != null
-                  ? item.accent
+                  ? item.accent!
                   : LineColors[depth % LineColors.length])
-              .withOpacity(legOpacity);
+              .withValues(alpha: legOpacity);
 
         /// Draw the line connecting the start&point of this item on the timeline.
         canvas.drawRect(
@@ -987,7 +677,7 @@ class TimelineRenderObject extends RenderBox {
       const double BubblePadding = 20.0;
 
       /// Let the timeline calculate the height for the current item's bubble.
-      double bubbleHeight = timeline.bubbleHeight(item);
+      double bubbleHeight = timeline!.bubbleHeight(item);
 
       /// Use [ui.ParagraphBuilder] to construct the label for canvas.
       ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
@@ -995,14 +685,14 @@ class TimelineRenderObject extends RenderBox {
         ..pushStyle(
             ui.TextStyle(color: const Color.fromRGBO(255, 255, 255, 1.0)));
 
-      builder.addText(item.label);
+      builder.addText(item.label!);
       ui.Paragraph labelParagraph = builder.build();
       labelParagraph.layout(ui.ParagraphConstraints(width: MaxLabelWidth));
 
       double textWidth =
           labelParagraph.maxIntrinsicWidth * item.opacity * item.labelOpacity;
-      double bubbleX = _timeline.renderLabelX -
-          Timeline.DepthOffset * _timeline.renderOffsetDepth;
+      double bubbleX = _timeline!.renderLabelX -
+          Timeline.DepthOffset * _timeline!.renderOffsetDepth;
       double bubbleY = item.labelY - bubbleHeight / 2.0;
 
       canvas.save();
@@ -1016,9 +706,9 @@ class TimelineRenderObject extends RenderBox {
           bubble,
           Paint()
             ..color = (item.accent != null
-                    ? item.accent
+                    ? item.accent!
                     : LineColors[depth % LineColors.length])
-                .withOpacity(item.opacity * item.labelOpacity));
+                .withValues(alpha: item.opacity * item.labelOpacity));
       canvas
           .clipRect(Rect.fromLTWH(BubblePadding, 0.0, textWidth, bubbleHeight));
       _tapTargets.add(TapTarget()
@@ -1033,7 +723,7 @@ class TimelineRenderObject extends RenderBox {
       canvas.restore();
       if (item.children != null) {
         /// Draw the other elements in the hierarchy.
-        drawItems(context, offset, item.children, x + Timeline.DepthOffset,
+        drawItems(context, offset, item.children!, x + Timeline.DepthOffset,
             scale, depth + 1);
       }
     }

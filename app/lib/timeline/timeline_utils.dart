@@ -7,38 +7,39 @@ import 'package:timeline/timeline/timeline_entry.dart';
 Color interpolateColor(Color from, Color to, double elapsed) {
   double r, g, b, a;
   double speed = min(1.0, elapsed * 5.0);
-  double c = to.alpha.toDouble() - from.alpha.toDouble();
+  double c = (to.a * 255.0) - (from.a * 255.0);
   if (c.abs() < 1.0) {
-    a = to.alpha.toDouble();
+    a = to.a * 255.0;
   } else {
-    a = from.alpha + c * speed;
+    a = from.a * 255.0 + c * speed;
   }
 
-  c = to.red.toDouble() - from.red.toDouble();
+  c = (to.r * 255.0) - (from.r * 255.0);
   if (c.abs() < 1.0) {
-    r = to.red.toDouble();
+    r = to.r * 255.0;
   } else {
-    r = from.red + c * speed;
+    r = from.r * 255.0 + c * speed;
   }
 
-  c = to.green.toDouble() - from.green.toDouble();
+  c = (to.g * 255.0) - (from.g * 255.0);
   if (c.abs() < 1.0) {
-    g = to.green.toDouble();
+    g = to.g * 255.0;
   } else {
-    g = from.green + c * speed;
+    g = from.g * 255.0 + c * speed;
   }
 
-  c = to.blue.toDouble() - from.blue.toDouble();
+  c = (to.b * 255.0) - (from.b * 255.0);
   if (c.abs() < 1.0) {
-    b = to.blue.toDouble();
+    b = to.b * 255.0;
   } else {
-    b = from.blue + c * speed;
+    b = from.b * 255.0 + c * speed;
   }
 
   return Color.fromARGB(a.round(), r.round(), g.round(), b.round());
 }
 
-String getExtension(String filename) {
+String? getExtension(String? filename) {
+  if (filename == null) return null;
   int dot = filename.lastIndexOf(".");
   if (dot == -1) {
     return null;
@@ -46,7 +47,8 @@ String getExtension(String filename) {
   return filename.substring(dot + 1);
 }
 
-String removeExtension(String filename) {
+String? removeExtension(String? filename) {
+  if (filename == null) return null;
   int dot = filename.lastIndexOf(".");
   if (dot == -1) {
     return null;
@@ -55,28 +57,28 @@ String removeExtension(String filename) {
 }
 
 class TimelineBackgroundColor {
-  Color color;
-  double start;
+  Color? color;
+  double start = 0.0;
 }
 
 class TickColors {
-  Color background;
-  Color long;
-  Color short;
-  Color text;
-  double start;
-  double screenY;
+  Color? background;
+  Color? long;
+  Color? short;
+  Color? text;
+  double start = 0.0;
+  double screenY = 0.0;
 }
 
 class HeaderColors {
-  Color background;
-  Color text;
-  double start;
-  double screenY;
+  Color? background;
+  Color? text;
+  double start = 0.0;
+  double screenY = 0.0;
 }
 
 class TapTarget {
-  TimelineEntry entry;
-  Rect rect;
+  TimelineEntry? entry;
+  Rect? rect;
   bool zoom = false;
 }

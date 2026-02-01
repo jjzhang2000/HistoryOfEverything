@@ -17,7 +17,7 @@ class FavoritesBloc {
   /// use those references to fill [_favorites].
   init(List<TimelineEntry> entries) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> favs = prefs.getStringList(FavoritesBloc.FAVORITES_KEY);
+    List<String>? favs = prefs.getStringList(FavoritesBloc.FAVORITES_KEY);
     /// A [Map] is used to optimize retrieval times when checking if a favorite
     /// is already present - in fact the label's used as the key.
     /// Checking if an element is in the map is O(1), making this process O(n)
@@ -28,7 +28,7 @@ class FavoritesBloc {
     }
     if (favs != null) {
       for (String f in favs) {
-        TimelineEntry entry = entriesMap[f];
+        TimelineEntry? entry = entriesMap[f];
         if (entry != null) {
           _favorites.add(entry);
         }
@@ -36,12 +36,12 @@ class FavoritesBloc {
     }
     /// Sort by starting time, so the favorites' list is always displayed in ascending order.
     _favorites.sort((TimelineEntry a, TimelineEntry b) {
-      return a.start.compareTo(b.start);
+      return a.start!.compareTo(b.start!);
     });
   }
 
   List<TimelineEntry> get favorites {
-    return _favorites;
+    return List.from(_favorites);
   }
 
   /// Save [e] into the list, re-sort it, and store to disk.
@@ -49,7 +49,7 @@ class FavoritesBloc {
     if (!_favorites.contains(e)) {
       this._favorites.add(e);
       _favorites.sort((TimelineEntry a, TimelineEntry b) {
-        return a.start.compareTo(b.start);
+        return a.start!.compareTo(b.start!);
       });
       _save();
     }

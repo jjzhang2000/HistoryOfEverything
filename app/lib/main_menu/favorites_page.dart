@@ -1,4 +1,5 @@
-import 'package:flare_flutter/flare_actor.dart';
+// TODO: Replace with Rive or other animation library
+// import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:timeline/bloc_provider.dart';
@@ -19,21 +20,21 @@ class FavoritesPage extends StatelessWidget {
   /// This widget displays a [ListView] for all the elements in the favorites.
   @override
   Widget build(BuildContext context) {
-    List<Widget> favorites = [];
+
     /// Access the favorites list from the [BlocProvider], which is available as a root
     /// element of the app.
-    List<TimelineEntry> entries = BlocProvider.favorites(context).favorites;
+    List<TimelineEntry> entries = BlocProvider.favorites(context)?.favorites ?? [];
 
     /// Add all the elements into a [List<Widget>] so that we can pass it to the [ListView] in the [Scaffold] body.
-    for (int i = 0; i < entries.length; i++) {
-      TimelineEntry entry = entries[i];
-      favorites.add(ThumbnailDetailWidget(entry, hasDivider: i != 0,
+    Widget buildItem(int index) {
+      TimelineEntry entry = entries[index];
+      return ThumbnailDetailWidget(entry, hasDivider: index != 0,
           tapSearchResult: (TimelineEntry entry) {
         MenuItemData item = MenuItemData.fromEntry(entry);
         Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) =>
-                TimelineWidget(item, BlocProvider.getTimeline(context))));
-      }));
+                TimelineWidget(item, BlocProvider.getTimeline(context)!)));
+      });
     }
 
     /// Use the same style for the top bar, with the usual colors and the correct icons.
@@ -46,7 +47,7 @@ class FavoritesPage extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: lightGrey,
           iconTheme: IconThemeData(
-            color: Colors.black.withOpacity(0.54),
+            color: Colors.black.withValues(alpha: 0.54),
           ),
           elevation: 0.0,
           centerTitle: false,
@@ -54,7 +55,7 @@ class FavoritesPage extends StatelessWidget {
             alignment: Alignment.centerLeft,
             icon: Icon(Icons.arrow_back),
             padding: EdgeInsets.only(left: 20.0, right: 20.0),
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             onPressed: () {
               Navigator.pop(context, true);
             },
@@ -65,11 +66,11 @@ class FavoritesPage extends StatelessWidget {
               style: TextStyle(
                   fontFamily: "RobotoMedium",
                   fontSize: 20.0,
-                  color: darkText.withOpacity(darkText.opacity * 0.75))),
+                  color: darkText.withValues(alpha: darkText.a * 0.75))),
         ),
         body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: favorites.isEmpty
+            child: entries.isEmpty
                 ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -80,8 +81,14 @@ class FavoritesPage extends StatelessWidget {
                               width: 128.0,
                               height: 114.0,
                               margin: EdgeInsets.only(bottom: 30),
-                              child: FlareActor("assets/Broken Heart.flr",
-                                  animation: "Heart Break", shouldClip: false)),
+                              // TODO: Replace with Rive or other animation widget
+                            // child: FlareActor("assets/Broken Heart.flr",
+                            //       animation: "Heart Break", shouldClip: false)
+                            child: Icon(
+                              Icons.heart_broken,
+                              size: 64.0,
+                              color: Colors.grey,
+                            )),
                           Container(
                             padding: EdgeInsets.only(bottom: 21),
                             width: 250,
@@ -91,7 +98,7 @@ class FavoritesPage extends StatelessWidget {
                                   fontFamily: "RobotoMedium",
                                   fontSize: 25,
                                   color: darkText
-                                      .withOpacity(darkText.opacity * 0.75),
+                                      .withValues(alpha: darkText.a * 0.75),
                                   height: 1.2,
                                 )),
                           ),
@@ -105,10 +112,13 @@ class FavoritesPage extends StatelessWidget {
                                     fontFamily: "Roboto",
                                     fontSize: 17,
                                     height: 1.5,
-                                    color: Colors.black.withOpacity(0.75))),
+                                    color: Colors.black.withValues(alpha: 0.75))),
                           ),
                         ])
                   ])
-                : ListView(children: favorites)));
+                : ListView.builder(
+                    itemCount: entries.length,
+                    itemBuilder: (context, index) => buildItem(index),
+                  )));
   }
 }

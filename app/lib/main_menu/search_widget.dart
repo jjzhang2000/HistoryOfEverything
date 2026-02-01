@@ -10,7 +10,7 @@ class SearchWidget extends StatelessWidget {
   final FocusNode _searchFocusNode;
   final TextEditingController _searchController;
 
-  SearchWidget(this._searchFocusNode, this._searchController, {Key key})
+  SearchWidget(this._searchFocusNode, this._searchController, {Key? key})
       : super(key: key);
 
   @override
@@ -29,7 +29,7 @@ class SearchWidget extends StatelessWidget {
       height: 40.0,
       child: Theme(
         data: ThemeData(
-          primaryColor: darkText.withOpacity(darkText.opacity * 0.5),
+          primaryColor: darkText.withValues(alpha: darkText.a * 0.5),
         ),
         child: TextField(
           controller: _searchController,
@@ -39,7 +39,7 @@ class SearchWidget extends StatelessWidget {
               hintStyle: TextStyle(
                 fontSize: 16.0,
                 fontFamily: "Roboto",
-                color: darkText.withOpacity(darkText.opacity * 0.5)
+                color: darkText.withValues(alpha: darkText.a * 0.5)
               ),
               prefixIcon: Icon(Icons.search),
               suffixIcon: _searchFocusNode.hasFocus
@@ -54,7 +54,7 @@ class SearchWidget extends StatelessWidget {
           style: TextStyle(
             fontSize: 16.0,
             fontFamily: "Roboto",
-            color: darkText.withOpacity(darkText.opacity),
+            color: darkText.withValues(alpha: darkText.a),
           ),
         ),
       ),

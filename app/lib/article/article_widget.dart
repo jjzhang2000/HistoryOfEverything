@@ -1,7 +1,7 @@
-import 'package:flare_flutter/flare_actor.dart';
+// import 'package:flare_flutter/flare_actor.dart';  // TODO: Reimplement with Rive
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter/widgets.dart';
+import 'package:timeline/animation/animation_exports.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:timeline/article/timeline_entry_widget.dart';
 import 'package:timeline/bloc_provider.dart';
@@ -12,7 +12,7 @@ import 'package:timeline/timeline/timeline_entry.dart';
 /// It stores a reference to the [TimelineEntry] that contains the relevant information.
 class ArticleWidget extends StatefulWidget {
   final TimelineEntry article;
-  ArticleWidget({this.article, Key key}) : super(key: key);
+  const ArticleWidget({required this.article, Key? key}) : super(key: key);
 
   @override
   _ArticleWidgetState createState() => _ArticleWidgetState();
@@ -30,7 +30,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
   String _subTitle = "";
   /// This page uses the `flutter_markdown` package, and thus needs its styles to be defined
   /// with a custom objects. This is created in [initState()].
-  MarkdownStyleSheet _markdownStyleSheet;
+  MarkdownStyleSheet? _markdownStyleSheet;
 
   /// Whether the [FlareActor] favorite button is active or not. 
   /// Triggers a Flare animation upon change.
@@ -38,7 +38,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
 
   /// This parameter helps control the Amelia Earhart and the Newton animations.
   /// Test it out yourself! =)
-  Offset _interactOffset;
+  Offset? _interactOffset;
 
   /// Set up the markdown style and the local field variables for this page.
   @override
@@ -46,29 +46,29 @@ class _ArticleWidgetState extends State<ArticleWidget> {
     super.initState();
 
     TextStyle style = TextStyle(
-        color: darkText.withOpacity(darkText.opacity * 0.68),
+        color: darkText.withValues(alpha: darkText.a * 0.68),
         fontSize: 17.0,
         height: 1.5,
         fontFamily: "Roboto");
     TextStyle h1 = TextStyle(
-        color: darkText.withOpacity(darkText.opacity * 0.68),
+        color: darkText.withValues(alpha: darkText.a * 0.68),
         fontSize: 32.0,
         height: 1.625,
         fontFamily: "Roboto",
         fontWeight: FontWeight.bold);
     TextStyle h2 = TextStyle(
-        color: darkText.withOpacity(darkText.opacity * 0.68),
+        color: darkText.withValues(alpha: darkText.a * 0.68),
         fontSize: 24.0,
         height: 2,
         fontFamily: "Roboto",
         fontWeight: FontWeight.bold);
     TextStyle strong = TextStyle(
-        color: darkText.withOpacity(darkText.opacity * 0.68),
+        color: darkText.withValues(alpha: darkText.a * 0.68),
         fontSize: 17.0,
         height: 1.5,
         fontFamily: "RobotoMedium");
     TextStyle em = TextStyle(
-        color: darkText.withOpacity(darkText.opacity * 0.68),
+        color: darkText.withValues(alpha: darkText.a * 0.68),
         fontSize: 17.0,
         height: 1.5,
         fontFamily: "Roboto",
@@ -89,21 +89,21 @@ class _ArticleWidgetState extends State<ArticleWidget> {
       img: style,
       blockSpacing: 20.0,
       listIndent: 20.0,
-      blockquotePadding: 20.0,
+      blockquotePadding: EdgeInsets.all(20.0),
     );
     setState(() {
       _title = widget.article.label;
       _subTitle = widget.article.formatYearsAgo();
       _articleMarkdown = "";
       if (widget.article.articleFilename != null) {
-        loadMarkdown(widget.article.articleFilename);
+        loadMarkdown(widget.article.articleFilename!);
       }
     });
   }
 
   /// Load the markdown file from the assets and set the contents of the page to its value.
   void loadMarkdown(String filename) async {
-    rootBundle.loadString("assets/Articles/" + filename).then((String data) {
+    rootBundle.loadString("assets/Articles/$filename").then((String data) {
       setState(() {
         _articleMarkdown = data;
       });
@@ -118,7 +118,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
   @override
   Widget build(BuildContext context) {
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
-    List<TimelineEntry> favs = BlocProvider.favorites(context).favorites;
+    List<TimelineEntry> favs = BlocProvider.favorites(context)?.favorites ?? [];
     bool isFav = favs.any(
         (TimelineEntry te) => te.label.toLowerCase() == _title.toLowerCase());
     return Scaffold(
@@ -134,7 +134,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
                       alignment: Alignment.centerLeft,
                       icon: Icon(Icons.arrow_back),
                       padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(alpha: 0.5),
                       onPressed: () {
                         Navigator.pop(context, true);
                       },
@@ -179,8 +179,8 @@ class _ArticleWidgetState extends State<ArticleWidget> {
                                         Text(_title,
                                             textAlign: TextAlign.left,
                                             style: TextStyle(
-                                              color: darkText.withOpacity(
-                                                  darkText.opacity * 0.87),
+                                              color: darkText.withValues(
+                                                  alpha: darkText.a * 0.87),
                                               fontSize: 25.0,
                                               height: 1.1,
                                               fontFamily: "Roboto",
@@ -188,51 +188,38 @@ class _ArticleWidgetState extends State<ArticleWidget> {
                                         Text(_subTitle,
                                             textAlign: TextAlign.left,
                                             style: TextStyle(
-                                                color: darkText.withOpacity(
-                                                    darkText.opacity * 0.5),
+                                                color: darkText.withValues(
+                                                    alpha: darkText.a * 0.5),
                                                 fontSize: 17.0,
                                                 height: 1.5,
                                                 fontFamily: "Roboto"))
                                       ]),
                                 ),
-                                GestureDetector(
-                                    child: Transform.translate(
-                                        offset: const Offset(15.0, 0.0),
-                                        child: Container(
-                                          height: 60.0,
-                                          width: 60.0,
-                                          padding: EdgeInsets.all(15.0),
-                                          color: Colors.white,
-                                          /// Check out the widget at:
-                                          /// https://www.2dimensions.com/a/pollux/files/flare/heart-simple/preview
-                                          child: FlareActor(
-                                              "assets/Favorite.flr",
-                                              animation: isFav
-                                                  ? "Favorite"
-                                                  : "Unfavorite",
-                                              shouldClip: false),
-                                        )),
-                                    onTap: () {
-                                      setState(() {
-                                        _isFavorite = !_isFavorite;
-                                      });
-                                      if (_isFavorite) {
-                                        BlocProvider.favorites(context)
-                                            .addFavorite(widget.article);
-                                      } else {
-                                        BlocProvider.favorites(context)
-                                            .removeFavorite(widget.article);
-                                      }
-                                    })
+                                AnimatedFavoriteButton(
+                                  isFavorite: isFav,
+                                  color: Colors.red,
+                                  onTap: () {
+                                    setState(() {
+                                      _isFavorite = !_isFavorite;
+                                    });
+                                    if (_isFavorite) {
+                                      BlocProvider.favorites(context)
+                                          ?.addFavorite(widget.article);
+                                    } else {
+                                      BlocProvider.favorites(context)
+                                          ?.removeFavorite(widget.article);
+                                    }
+                                  },
+                                )
                               ]),
                             ),
                             Container(
                                 margin: EdgeInsets.only(top: 20, bottom: 20),
                                 height: 1,
-                                color: Colors.black.withOpacity(0.11)),
+                                color: Colors.black.withValues(alpha: 0.11)),
                             MarkdownBody(
                                 data: _articleMarkdown,
-                                styleSheet: _markdownStyleSheet),
+                                styleSheet: _markdownStyleSheet!),
                             SizedBox(height: 100),
                           ],
                         )))

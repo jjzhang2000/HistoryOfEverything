@@ -69,14 +69,14 @@ class Ticks {
     /// depending on the current era. The [TickColors] object, in `timeline_utils.dart`,
     /// wraps this information.
     List<TickColors> tickColors = timeline.tickColors;
-    if (tickColors != null && tickColors.length > 0) {
+    if (tickColors.isNotEmpty) {
       /// Build up the color stops for the linear gradient.
       double rangeStart = tickColors.first.start;
       double range = tickColors.last.start - tickColors.first.start;
       List<ui.Color> colors = <ui.Color>[];
       List<double> stops = <double>[];
       for (TickColors bg in tickColors) {
-        colors.add(bg.background);
+        colors.add(bg.background!);
         stops.add((bg.start - rangeStart) / range);
       }
       double s =
@@ -96,13 +96,13 @@ class Ticks {
         canvas.drawRect(
             Rect.fromLTWH(
                 offset.dx, offset.dy, gutterWidth, y1 - offset.dy + 1.0),
-            ui.Paint()..color = tickColors.first.background);
+            ui.Paint()..color = tickColors.first.background!);
       }
       if (y2 < offset.dy + height) {
         canvas.drawRect(
             Rect.fromLTWH(
                 offset.dx, y2 - 1, gutterWidth, (offset.dy + height) - y2),
-            ui.Paint()..color = tickColors.last.background);
+            ui.Paint()..color = tickColors.last.background!);
       }
       /// Draw the gutter.
       canvas.drawRect(
@@ -122,18 +122,19 @@ class Ticks {
       int tt = startingTickMarkValue.round();
       tt = -tt;
       int o = tickOffset.floor();
-      TickColors colors = timeline.findTickColors(offset.dy + height - o);
+      TickColors? colors = timeline.findTickColors(offset.dy + height - o);
+      if (colors == null) continue;
       if (tt % textTickDistance == 0) {
         /// Every `textTickDistance`, draw a wider tick with the a label laid on top.
         canvas.drawRect(
             Rect.fromLTWH(offset.dx + gutterWidth - TickSize,
                 offset.dy + height - o, TickSize, 1.0),
-            Paint()..color = colors.long);
+            Paint()..color = colors.long ?? Colors.black);
         /// Drawing text to [canvas] is done by using the [ParagraphBuilder] directly.
         ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
             textAlign: TextAlign.end, fontFamily: "Roboto", fontSize: 10.0))
           ..pushStyle(ui.TextStyle(
-              color: colors.text));
+              color: colors.text ?? Colors.black));
 
         int value = tt.round().abs();
         /// Format the label nicely depending on how long ago the tick is placed at.
@@ -141,11 +142,15 @@ class Ticks {
         if (value < 9000) {
           label = value.toStringAsFixed(0);
         } else {
-          NumberFormat formatter = NumberFormat.compact();
+          NumberFormat formatter = NumberFormat.compact()
+            ..minimumSignificantDigits = 3
+            ..maximumSignificantDigits = 3;
           label = formatter.format(value);
-          int digits = formatter.significantDigits;
+          int digits = formatter.maximumSignificantDigits ?? 3;
           while (usedValues.contains(label) && digits < 10) {
-            formatter.significantDigits = ++digits;
+            formatter
+              ..minimumSignificantDigits = ++digits
+              ..maximumSignificantDigits = digits;
             label = formatter.format(value);
           }
         }
@@ -163,7 +168,7 @@ class Ticks {
         canvas.drawRect(
             Rect.fromLTWH(offset.dx + gutterWidth - SmallTickSize,
                 offset.dy + height - o, SmallTickSize, 1.0),
-            Paint()..color = colors.short);
+            Paint()..color = colors.short ?? Colors.black);
       }
       startingTickMarkValue += tickDistance;
     }

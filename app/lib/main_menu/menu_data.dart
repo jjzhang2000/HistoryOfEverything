@@ -7,18 +7,18 @@ import 'package:timeline/timeline/timeline_entry.dart';
 
 /// Data container for the Section loaded in [MenuData.loadFromBundle()].
 class MenuSectionData {
-  String label;
-  Color textColor;
-  Color backgroundColor;
-  String assetId;
-  List<MenuItemData> items = List<MenuItemData>();
+  String? label;
+  Color? textColor;
+  Color? backgroundColor;
+  String? assetId;
+  List<MenuItemData> items = <MenuItemData>[];
 }
 
 /// Data container for all the sub-elements of the [MenuSection].
 class MenuItemData {
-  String label;
-  double start;
-  double end;
+  String? label;
+  double? start;
+  double? end;
   bool pad = false;
   double padTop = 0.0;
   double padBottom = 0.0;
@@ -33,7 +33,7 @@ class MenuItemData {
 
     /// Pad the edges of the screen.
     pad = true;
-    TimelineAsset asset = entry.asset;
+    TimelineAsset? asset = entry.asset;
     /// Extra padding for the top base don the asset size.
     padTop = asset == null ? 0.0 : asset.height * Timeline.AssetScreenScale;
     if (asset is TimelineAnimatedAsset) {
@@ -41,15 +41,15 @@ class MenuItemData {
     }
 
     if (entry.type == TimelineEntryType.Era) {
-      start = entry.start;
+      start = entry.start!;
       end = entry.end;
     } else {
       /// No need to pad here as we are centering on a single item.
       double rangeBefore = double.maxFinite;
-      for (TimelineEntry prev = entry.previous;
+      for (TimelineEntry? prev = entry.previous;
           prev != null;
           prev = prev.previous) {
-        double diff = entry.start - prev.start;
+        double diff = entry.start! - prev.start!;
         if (diff > 0.0) {
           rangeBefore = diff;
           break;
@@ -57,8 +57,8 @@ class MenuItemData {
       }
 
       double rangeAfter = double.maxFinite;
-      for (TimelineEntry next = entry.next; next != null; next = next.next) {
-        double diff = next.start - entry.start;
+      for (TimelineEntry? next = entry.next; next != null; next = next.next) {
+        double diff = next.start! - entry.start!;
         if (diff > 0.0) {
           rangeAfter = diff;
           break;
@@ -66,7 +66,7 @@ class MenuItemData {
       }
       double range = min(rangeBefore, rangeAfter) / 2.0;
       start = entry.start;
-      end = entry.end + range;
+      end = entry.end! + range;
     }
   }
 }
@@ -84,7 +84,7 @@ class MenuItemData {
 class MenuData {
   List<MenuSectionData> sections = [];
   Future<bool> loadFromBundle(String filename) async {
-    List<MenuSectionData> menu = List<MenuSectionData>();
+    List<MenuSectionData> menu = <MenuSectionData>[];
     String data = await rootBundle.loadString(filename);
     List jsonEntries = json.decode(data) as List;
     for (dynamic entry in jsonEntries) {

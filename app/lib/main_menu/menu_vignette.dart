@@ -2,13 +2,13 @@ import 'dart:math';
 import 'dart:ui';
 import 'dart:ui' as ui;
 
-import 'package:flare_dart/actor_image.dart' as flare;
-import 'package:flare_dart/math/aabb.dart' as flare;
+// import 'package:flare_dart/actor_image.dart' as flare;  // TODO: Reimplement with Rive
+// import 'package:flare_dart/math/aabb.dart' as flare;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:nima/nima/actor_image.dart' as nima;
-import 'package:nima/nima/math/aabb.dart' as nima;
+// import 'package:nima/nima/actor_image.dart' as nima;  // TODO: Reimplement with Rive
+// import 'package:nima/nima/math/aabb.dart' as nima;
 import 'package:timeline/bloc_provider.dart';
 import 'package:timeline/timeline/timeline.dart';
 import 'package:timeline/timeline/timeline_entry.dart';
@@ -24,14 +24,14 @@ class MenuVignette extends LeafRenderObjectWidget {
   /// Also makes the sub-section more readable.
   final Color gradientColor;
 
-  MenuVignette({Key key, this.gradientColor, this.isActive, this.assetId})
+  MenuVignette({Key? key, required this.gradientColor, required this.isActive, required this.assetId})
       : super(key: key);
 
   @override
   RenderObject createRenderObject(BuildContext context) {
     /// The [BlocProvider] widgets down the tree to access its components
     /// optimizing memory consumption and simplifying the code-base.
-    Timeline t = BlocProvider.getTimeline(context);
+    Timeline? t = BlocProvider.getTimeline(context);
     return MenuVignetteRenderObject()
       ..timeline = t
       ..assetId = assetId
@@ -44,7 +44,7 @@ class MenuVignette extends LeafRenderObjectWidget {
       BuildContext context, covariant MenuVignetteRenderObject renderObject) {
     /// The [BlocProvider] widgets down the tree to access its components
     /// optimizing memory consumption and simplifying the code-base.
-    Timeline t = BlocProvider.getTimeline(context);
+    Timeline? t = BlocProvider.getTimeline(context);
     renderObject
       ..timeline = t
       ..assetId = assetId
@@ -64,19 +64,19 @@ class MenuVignette extends LeafRenderObjectWidget {
 /// Flare/Nima [FlutterActor] where the widget is being placed.
 class MenuVignetteRenderObject extends RenderBox {
   /// The [_timeline] object is used here to retrieve the asset through [getById()].
-  Timeline _timeline;
-  String _assetId;
+  Timeline? _timeline;
+  String? _assetId;
   /// If this object is not active, stop playing. This optimizes resource consumption
   /// and makes sure that each [FlutterActor] remains coherent throughout its animation.
   bool _isActive = false;
   bool _firstUpdate = true;
   double _lastFrameTime = 0.0;
-  Color gradientColor;
+  late Color gradientColor;
   bool _isFrameScheduled = false;
   double opacity = 0.0;
 
-  Timeline get timeline => _timeline;
-  set timeline(Timeline value) {
+  Timeline? get timeline => _timeline;
+  set timeline(Timeline? value) {
     if (_timeline == value) {
       return;
     }
@@ -85,7 +85,7 @@ class MenuVignetteRenderObject extends RenderBox {
     updateRendering();
   }
 
-  set assetId(String id) {
+  set assetId(String? id) {
     if (_assetId != id) {
       _assetId = id;
       updateRendering();
@@ -102,11 +102,11 @@ class MenuVignetteRenderObject extends RenderBox {
     updateRendering();
   }
 
-  TimelineEntry get timelineEntry {
+  TimelineEntry? get timelineEntry {
     if (_timeline == null) {
       return null;
     }
-    return _timeline.getById(_assetId);
+    return _timeline!.getById(_assetId!);
   }
 
   @override
@@ -137,7 +137,7 @@ class MenuVignetteRenderObject extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
-    TimelineAsset asset = timelineEntry?.asset;
+    TimelineAsset? asset = timelineEntry?.asset;
 
     /// Don't paint if not needed.
     if (asset == null) {
@@ -151,16 +151,17 @@ class MenuVignetteRenderObject extends RenderBox {
     double h = asset.height;
 
     /// If the asset is just a static image, draw the image directly to [canvas].
-    if (asset is TimelineImage) {
+    if (asset is TimelineImage && asset.image != null) {
       canvas.drawImageRect(
-          asset.image,
+          asset.image!,
           Rect.fromLTWH(0.0, 0.0, asset.width, asset.height),
           Rect.fromLTWH(offset.dx + size.width - w, asset.y, w, h),
           Paint()
             ..isAntiAlias = true
             ..filterQuality = ui.FilterQuality.low
-            ..color = Colors.white.withOpacity(asset.opacity));
+            ..color = Colors.white.withValues(alpha: asset.opacity));
     } else if (asset is TimelineNima && asset.actor != null) {
+      // TODO: Nima rendering commented out for null safety migration
       Alignment alignment = Alignment.topRight;
       BoxFit fit = BoxFit.cover;
 
@@ -169,15 +170,15 @@ class MenuVignetteRenderObject extends RenderBox {
       /// 1. Calculate the bounds for the current object.
       /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
       /// We rely on this AABB to perform screen-space calculations.
-      nima.AABB bounds = asset.setupAABB;
+      // nima.AABB bounds = asset.setupAABB;
+      // TODO: Reimplement with Rive
 
-      double contentHeight = bounds[3] - bounds[1];
-      double contentWidth = bounds[2] - bounds[0];
-      double x =
-          -bounds[0] - contentWidth / 2.0 - (alignment.x * contentWidth / 2.0);
-      double y = -bounds[1] -
-          contentHeight / 2.0 +
-          (alignment.y * contentHeight / 2.0);
+      double contentHeight = 100.0; // bounds[3] - bounds[1];
+      double contentWidth = 100.0; // bounds[2] - bounds[0];
+      double x = 0.0;
+      // -bounds[0] - contentWidth / 2.0 - (alignment.x * contentWidth / 2.0);
+      double y = 0.0;
+      // -bounds[1] - contentHeight / 2.0 + (alignment.y * contentHeight / 2.0);
 
       Offset renderOffset = offset;
       Size renderSize = size;
@@ -246,8 +247,8 @@ class MenuVignetteRenderObject extends RenderBox {
       /// and cover it with a linear gradient.
       double gradientFade = 1.0 - opacity;
       List<ui.Color> colors = <ui.Color>[
-        gradientColor.withOpacity(gradientFade),
-        gradientColor.withOpacity(min(1.0, gradientFade + 0.9))
+        gradientColor.withValues(alpha: gradientFade),
+        gradientColor.withValues(alpha: min(1.0, gradientFade + 0.9))
       ];
       List<double> stops = <double>[0.0, 1.0];
 
@@ -257,6 +258,7 @@ class MenuVignetteRenderObject extends RenderBox {
         ..style = ui.PaintingStyle.fill;
       canvas.drawRect(offset & size, paint);
     } else if (asset is TimelineFlare && asset.actor != null) {
+      // TODO: Flare rendering commented out for null safety migration
       Alignment alignment = Alignment.center;
       BoxFit fit = BoxFit.cover;
       /// If we have a [TimelineFlare]  actor set it up properly and paint it.
@@ -265,14 +267,14 @@ class MenuVignetteRenderObject extends RenderBox {
       /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
       /// We rely on this AABB to perform screen-space calculations.
 
-      flare.AABB bounds = asset.setupAABB;
-      double contentWidth = bounds[2] - bounds[0];
-      double contentHeight = bounds[3] - bounds[1];
-      double x =
-          -bounds[0] - contentWidth / 2.0 - (alignment.x * contentWidth / 2.0);
-      double y = -bounds[1] -
-          contentHeight / 2.0 +
-          (alignment.y * contentHeight / 2.0);
+      // flare.AABB bounds = asset.setupAABB;
+      // TODO: Reimplement with Rive
+      double contentWidth = 100.0; // bounds[2] - bounds[0];
+      double contentHeight = 100.0; // bounds[3] - bounds[1];
+      double x = 0.0;
+      // -bounds[0] - contentWidth / 2.0 - (alignment.x * contentWidth / 2.0);
+      double y = 0.0;
+      // -bounds[1] - contentHeight / 2.0 + (alignment.y * contentHeight / 2.0);
 
       Offset renderOffset = offset;
       Size renderSize = size;
@@ -341,8 +343,8 @@ class MenuVignetteRenderObject extends RenderBox {
       /// and cover it with a linear gradient.
       double gradientFade = 1.0 - opacity;
       List<ui.Color> colors = <ui.Color>[
-        gradientColor.withOpacity(gradientFade),
-        gradientColor.withOpacity(min(1.0, gradientFade + 0.9))
+        gradientColor.withValues(alpha: gradientFade),
+        gradientColor.withValues(alpha: min(1.0, gradientFade + 0.9))
       ];
       List<double> stops = <double>[0.0, 1.0];
 
@@ -374,9 +376,9 @@ class MenuVignetteRenderObject extends RenderBox {
     /// Calculate the elapsed time to [advance()] the animations.
     double elapsed = t - _lastFrameTime;
     _lastFrameTime = t;
-    TimelineEntry entry = timelineEntry;
+    TimelineEntry? entry = timelineEntry;
     if (entry != null) {
-      TimelineAsset asset = entry.asset;
+      TimelineAsset? asset = entry.asset;
       if (asset is TimelineNima && asset.actor != null) {
         /// Modulate the opacity value used by [gradientFade].
         if (opacity < 1.0) {

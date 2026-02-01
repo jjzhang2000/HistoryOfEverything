@@ -23,10 +23,10 @@ class ThumbnailDetailWidget extends StatelessWidget {
   /// Whether to show a divider line on the bottom of this widget. Defaults to `true`.
   final bool hasDivider;
   /// Callback to navigate to the timeline (see [MainMenuWidget._tapSearchResult()]).
-  final TapSearchResultCallback tapSearchResult;
+  final TapSearchResultCallback? tapSearchResult;
 
   ThumbnailDetailWidget(this.timelineEntry,
-      {this.hasDivider = true, this.tapSearchResult, Key key})
+      {this.hasDivider = true, this.tapSearchResult, Key? key})
       : super(key: key);
 
 
@@ -42,7 +42,7 @@ class ThumbnailDetailWidget extends StatelessWidget {
         child: InkWell(
           onTap: () {
             if (tapSearchResult != null) {
-              tapSearchResult(timelineEntry);
+              tapSearchResult!(timelineEntry);
             }
           },
           child: Column(
@@ -70,13 +70,13 @@ class ThumbnailDetailWidget extends StatelessWidget {
                                   fontFamily: "RobotoMedium",
                                   fontSize: 20.0,
                                   color: darkText
-                                      .withOpacity(darkText.opacity * 0.75)),
+                                      .withValues(alpha: darkText.a * 0.75)),
                             ),
                             Text(timelineEntry.formatYearsAgo(),
                                 style: TextStyle(
                                     fontFamily: "Roboto",
                                     fontSize: 14.0,
-                                    color: Colors.black.withOpacity(0.5)))
+                                    color: Colors.black.withValues(alpha: 0.5)))
                           ]),
                     ))
                   ],

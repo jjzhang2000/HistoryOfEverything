@@ -11,15 +11,15 @@ class ThumbnailWidget extends StatelessWidget {
   /// Reference to the entry to get the thumbnail image information.
   final TimelineEntry entry;
 
-  ThumbnailWidget(this.entry, {Key key}) : super(key: key);
+  ThumbnailWidget(this.entry, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    TimelineAsset asset = entry.asset;
+    TimelineAsset? asset = entry.asset;
     Widget thumbnail;
     /// Check if the [entry.asset] provided is already a [TimelineImage]. 
     if (asset is TimelineImage) {
-      thumbnail = RawImage(image: asset.image);
+      thumbnail = RawImage(image: asset.image!);
     } else if (asset is TimelineNima || asset is TimelineFlare) {
       /// If not, retrieve the image from the Nima/Flare [TimelineAsset], and set it as inactive (i.e. a static image).
       thumbnail = TimelineEntryWidget(

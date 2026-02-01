@@ -15,8 +15,7 @@ class TimelineApp extends StatelessWidget {
     return BlocProvider(
       child: MaterialApp(
         title: 'History & Future of Everything',
-        theme: ThemeData(
-            backgroundColor: background, scaffoldBackgroundColor: background),
+        theme: ThemeData(scaffoldBackgroundColor: background),
         home: MenuPage(),
       ),
       platform: Theme.of(context).platform,

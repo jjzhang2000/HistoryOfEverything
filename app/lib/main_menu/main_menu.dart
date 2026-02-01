@@ -4,7 +4,7 @@ import "dart:io";
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import "package:flutter/widgets.dart";
-import "package:share/share.dart";
+import "package:share_plus/share_plus.dart";
 import 'package:timeline/bloc_provider.dart';
 import 'package:timeline/main_menu/collapsible.dart';
 
@@ -26,7 +26,7 @@ import 'package:timeline/timeline/timeline_widget.dart';
 /// and it'll provide on the bottom three links for quick access to your Favorites,
 /// a Share Menu and the About Page.
 class MainMenuWidget extends StatefulWidget {
-  MainMenuWidget({Key key}) : super(key: key);
+  MainMenuWidget({Key? key}) : super(key: key);
 
   @override
   _MainMenuWidgetState createState() => _MainMenuWidgetState();
@@ -47,7 +47,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
   bool _isSectionActive = true;
 
   /// The [List] of search results that is displayed when searching.
-  List<TimelineEntry> _searchResults = List<TimelineEntry>();
+  List<TimelineEntry> _searchResults = <TimelineEntry>[];
 
   /// [MenuData] is a wrapper object for the data of each Card section.
   /// This data is loaded from the asset bundle during [initState()]
@@ -56,12 +56,12 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
   /// This is passed to the SearchWidget so we can handle text edits and display the search results on the main menu.
   final TextEditingController _searchTextController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  Timer _searchTimer;
+  Timer? _searchTimer;
 
   cancelSearch() {
-    if (_searchTimer != null && _searchTimer.isActive) {
+    if (_searchTimer != null && _searchTimer!.isActive) {
       /// Remove old timer.
-      _searchTimer.cancel();
+      _searchTimer!.cancel();
       _searchTimer = null;
     }
   }
@@ -76,7 +76,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
     Navigator.of(context)
         .push(MaterialPageRoute(
           builder: (BuildContext context) =>
-              TimelineWidget(item, BlocProvider.getTimeline(context)),
+              TimelineWidget(item, BlocProvider.getTimeline(context)!),
         ))
         .then(_restoreSection);
   }
@@ -90,7 +90,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
     cancelSearch();
     if (!_isSearching) {
       setState(() {
-        _searchResults = List<TimelineEntry>();
+        _searchResults = <TimelineEntry>[];
       });
       return;
     }
@@ -129,19 +129,15 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
     });
   }
 
-  /// A [WillPopScope] widget wraps the menu, so that before dismissing the whole app,
-  /// search will be popped first. Otherwise the app will proceed as usual.
-  Future<bool> _popSearch() {
-    if (_isSearching) {
+  /// Handle pop invocation for PopScope.
+  /// When searching, cancel search instead of popping the page.
+  void _onPopInvoked(bool didPop) {
+    if (!didPop && _isSearching) {
       setState(() {
         _searchFocusNode.unfocus();
         _searchTextController.clear();
         _isSearching = false;
       });
-      return Future(() => false);
-    } else {
-      Navigator.of(context).pop(true);
-      return Future(() => true);
     }
   }
 
@@ -171,9 +167,9 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
             .map<Widget>((MenuSectionData section) => Container(
                 margin: EdgeInsets.only(top: 20.0),
                 child: MenuSection(
-                  section.label,
-                  section.backgroundColor,
-                  section.textColor,
+                  section.label!,
+                  section.backgroundColor!,
+                  section.textColor!,
                   section.items,
                   navigateToTimeline,
                   _isSectionActive,
@@ -185,7 +181,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
           height: 1.0,
           color: const Color.fromRGBO(151, 151, 151, 0.29),
         ))
-        ..add(FlatButton(
+        ..add(TextButton(
             onPressed: () {
               _pauseSection();
               Navigator.of(context)
@@ -193,7 +189,9 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                       builder: (BuildContext context) => FavoritesPage()))
                   .then(_restoreSection);
             },
-            color: Colors.transparent,
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.transparent,
+            ),
             child:
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Container(
@@ -201,20 +199,22 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                 child: Image.asset("assets/heart_icon.png",
                     height: 20.0,
                     width: 20.0,
-                    color: Colors.black.withOpacity(0.65)),
+                    color: Colors.black.withValues(alpha: 0.65)),
               ),
               Text(
                 "Your Favorites",
                 style: TextStyle(
                     fontSize: 20.0,
                     fontFamily: "RobotoMedium",
-                    color: Colors.black.withOpacity(0.65)),
+                    color: Colors.black.withValues(alpha: 0.65)),
               )
             ])))
-        ..add(FlatButton(
+        ..add(TextButton(
             onPressed: () => Share.share(
                 "Check out The History of Everything! " + (Platform.isAndroid ? "https://play.google.com/store/apps/details?id=com.twodimensions.timeline" : "itms://itunes.apple.com/us/app/apple-store/id1441257460?mt=8")),
-            color: Colors.transparent,
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.transparent,
+            ),
             child:
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Container(
@@ -222,19 +222,19 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                 child: Image.asset("assets/share_icon.png",
                     height: 20.0,
                     width: 20.0,
-                    color: Colors.black.withOpacity(0.65)),
+                    color: Colors.black.withValues(alpha: 0.65)),
               ),
               Text(
                 "Share",
                 style: TextStyle(
                     fontSize: 20.0,
                     fontFamily: "RobotoMedium",
-                    color: Colors.black.withOpacity(0.65)),
+                    color: Colors.black.withValues(alpha: 0.65)),
               )
             ])))
         ..add(Padding(
           padding: const EdgeInsets.only(bottom: 30.0),
-          child: FlatButton(
+          child: TextButton(
               onPressed: () {
                 _pauseSection();
                 Navigator.of(context)
@@ -242,7 +242,9 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                         builder: (BuildContext context) => AboutPage()))
                     .then(_restoreSection);
               },
-              color: Colors.transparent,
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.transparent,
+              ),
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 Container(
@@ -250,25 +252,26 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                   child: Image.asset("assets/info_icon.png",
                       height: 20.0,
                       width: 20.0,
-                      color: Colors.black.withOpacity(0.65)),
+                      color: Colors.black.withValues(alpha: 0.65)),
                 ),
                 Text(
                   "About",
                   style: TextStyle(
                       fontSize: 20.0,
                       fontFamily: "RobotoMedium",
-                      color: Colors.black.withOpacity(0.65)),
+                      color: Colors.black.withValues(alpha: 0.65)),
                 )
               ])),
         ));
     }
 
-    /// Wrap the menu in a [WillPopScope] to properly handle a pop event while searching.
+    /// Wrap the menu in a [PopScope] to properly handle a pop event while searching.
     /// A [SingleChildScrollView] is used to create a scrollable view for the main menu.
     /// This will contain a [Column] with a [Collapsible] header on top, and a [tail]
     /// that's built according with the state of this widget.
-    return WillPopScope(
-      onWillPop: _popSearch,
+    return PopScope(
+      canPop: !_isSearching,
+      onPopInvokedWithResult: (didPop, result) => _onPopInvoked(didPop),
       child: Container(
           color: background,
           child: Padding(
@@ -295,8 +298,8 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                                     Text("The History of Everything",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
-                                            color: darkText.withOpacity(
-                                                darkText.opacity * 0.75),
+                                            color: darkText.withValues(
+                                                alpha: darkText.a * 0.75),
                                             fontSize: 34.0,
                                             fontFamily: "RobotoMedium"))
                                   ])),

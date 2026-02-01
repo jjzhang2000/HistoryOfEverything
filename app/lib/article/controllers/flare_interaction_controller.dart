@@ -1,15 +1,10 @@
-import 'package:flare_flutter/flare.dart' as flare;
-import 'package:flare_dart/math/mat2d.dart' as flare;
-import 'package:flare_dart/math/vec2d.dart' as flare;
+// TODO: Reimplement with Rive
+// import 'package:flare_flutter/flare.dart' as flare;
+// import 'package:flare_dart/math/mat2d.dart' as flare;
+// import 'package:flare_dart/math/vec2d.dart' as flare;
 
-/// Controllers are used in our Flare library to provide custom behaviors for animations.
+/// Controllers are used to provide custom behaviors for animations.
+/// Stub class - will be reimplemented with Rive.
 abstract class FlareInteractionController {
-  /// This'll be called upon initialization: use it to set up the controller.
-  /// Generally that means grabbing the references to the Actor nodes that
-  /// will be performing a custom action.
-  void initialize(flare.FlutterActorArtboard artboard);
-  
-  /// This callback is used to advance the controller when the animation itself is advancing.
-  bool advance(flare.FlutterActorArtboard artboard, flare.Vec2D touchPosition,
-      double elapsed);
+  // Stub - will be reimplemented
 }

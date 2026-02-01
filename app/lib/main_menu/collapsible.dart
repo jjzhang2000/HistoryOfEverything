@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 /// This widget is used to animate the header above [SearchWidget] so that it
 /// smoothly collapses and expands when a change in the state is detected.
 class Collapsible extends StatefulWidget {
-  final Widget child;
+  final Widget? child;
   final bool isCollapsed;
-  Collapsible({this.child, this.isCollapsed, Key key}) : super(key: key);
+  Collapsible({this.child, required this.isCollapsed, Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => CollapsibleState();
@@ -17,7 +17,7 @@ class CollapsibleState extends State<Collapsible>
     with SingleTickerProviderStateMixin {
   /// The [AnimationController] is a Flutter Animation object that generates a new value
   /// whenever the hardware is ready to draw a new frame.
-  AnimationController _controller;
+  late AnimationController _controller;
   /// Since the above object interpolates only between 0 and 1, but we'd rather apply a curve to the current
   /// animation, we're providing a custom [Tween] that allows to build more advanced animations, as seen in [initState()].
   static final Animatable<double> _sizeTween = Tween<double>(
@@ -26,7 +26,7 @@ class CollapsibleState extends State<Collapsible>
   );
 
   /// The [Animation] object itself, which is required by the [SizeTransition] widget in the [build()] method.
-  Animation<double> _sizeAnimation;
+  late Animation<double> _sizeAnimation;
 
   /// Here we initialize the fields described above, and set up the widget to its initial state.
   @override
