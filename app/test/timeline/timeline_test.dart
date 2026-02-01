@@ -126,13 +126,13 @@ void main() {
 
     group('Timeline Constants', () {
       test('should have correct constants', () {
-        expect(Timeline.LineWidth, equals(2.0));
-        expect(Timeline.LineSpacing, equals(10.0));
-        expect(Timeline.DepthOffset, equals(12.0)); // LineSpacing (10.0) + LineWidth (2.0)
-        expect(Timeline.EdgePadding, equals(8.0));
-        expect(Timeline.MoveSpeed, equals(10.0));
-        expect(Timeline.Deceleration, equals(3.0));
-        expect(Timeline.GutterLeft, equals(45.0));
+        expect(Timeline.lineWidth, equals(2.0));
+        expect(Timeline.lineSpacing, equals(10.0));
+        expect(Timeline.depthOffset, equals(12.0)); // LineSpacing (10.0) + LineWidth (2.0)
+        expect(Timeline.edgePadding, equals(8.0));
+        expect(Timeline.moveSpeed, equals(10.0));
+        expect(Timeline.deceleration, equals(3.0));
+        expect(Timeline.gutterLeft, equals(45.0));
       });
     });
 

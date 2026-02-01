@@ -35,7 +35,7 @@ class MenuItemData {
     pad = true;
     TimelineAsset? asset = entry.asset;
     /// Extra padding for the top base don the asset size.
-    padTop = asset == null ? 0.0 : asset.height * Timeline.AssetScreenScale;
+    padTop = asset == null ? 0.0 : asset.height * Timeline.assetScreenScale;
     if (asset is TimelineAnimatedAsset) {
       padTop += asset.gap;
     }
@@ -90,50 +90,45 @@ class MenuData {
     for (dynamic entry in jsonEntries) {
       Map map = entry as Map;
 
-      if (map != null) {
-        MenuSectionData menuSection = MenuSectionData();
-        menu.add(menuSection);
-        if (map.containsKey("label")) {
-          menuSection.label = map["label"] as String;
-        }
-        if (map.containsKey("background")) {
-          menuSection.backgroundColor = Color(int.parse(
-                  (map["background"] as String).substring(1, 7),
-                  radix: 16) +
-              0xFF000000);
-        }
-        if (map.containsKey("color")) {
-          menuSection.textColor = Color(
-              int.parse((map["color"] as String).substring(1, 7), radix: 16) +
-                  0xFF000000);
-        }
-        if (map.containsKey("asset")) {
-          menuSection.assetId = map["asset"] as String;
-        }
-        if (map.containsKey("items")) {
-          List items = map["items"] as List;
-          for (dynamic item in items) {
-            Map itemMap = item as Map;
-            if (itemMap == null) {
-              continue;
-            }
-            MenuItemData itemData = MenuItemData();
-            if (itemMap.containsKey("label")) {
-              itemData.label = itemMap["label"] as String;
-            }
-            if (itemMap.containsKey("start")) {
-              dynamic start = itemMap["start"];
-              itemData.start = start is int ? start.toDouble() : start;
-            }
-            if (itemMap.containsKey("end")) {
-              dynamic end = itemMap["end"];
-              itemData.end = end is int ? end.toDouble() : end;
-            }
-            menuSection.items.add(itemData);
+      MenuSectionData menuSection = MenuSectionData();
+      menu.add(menuSection);
+      if (map.containsKey("label")) {
+        menuSection.label = map["label"] as String;
+      }
+      if (map.containsKey("background")) {
+        menuSection.backgroundColor = Color(int.parse(
+                (map["background"] as String).substring(1, 7),
+                radix: 16) +
+            0xFF000000);
+      }
+      if (map.containsKey("color")) {
+        menuSection.textColor = Color(
+            int.parse((map["color"] as String).substring(1, 7), radix: 16) +
+                0xFF000000);
+      }
+      if (map.containsKey("asset")) {
+        menuSection.assetId = map["asset"] as String;
+      }
+      if (map.containsKey("items")) {
+        List items = map["items"] as List;
+        for (dynamic item in items) {
+          Map itemMap = item as Map;
+          MenuItemData itemData = MenuItemData();
+          if (itemMap.containsKey("label")) {
+            itemData.label = itemMap["label"] as String;
           }
+          if (itemMap.containsKey("start")) {
+            dynamic start = itemMap["start"];
+            itemData.start = start is int ? start.toDouble() : start;
+          }
+          if (itemMap.containsKey("end")) {
+            dynamic end = itemMap["end"];
+            itemData.end = end is int ? end.toDouble() : end;
+          }
+          menuSection.items.add(itemData);
         }
       }
-    }
+        }
     sections = menu;
     return true;
   }

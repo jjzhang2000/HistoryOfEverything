@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:timeline/colors.dart';
 import 'package:timeline/timeline/timeline_entry.dart';
@@ -9,7 +8,7 @@ import 'thumbnail.dart';
 /// 
 /// This callback allows the [MainMenuWidget] to display the [TimelineWidget] and position it
 /// to the right start/end time for the [entry].
-typedef TapSearchResultCallback(TimelineEntry entry);
+typedef TapSearchResultCallback = Function(TimelineEntry entry);
 
 /// This widget lays out nicely the [timelineEntry] provided.
 /// 
@@ -25,9 +24,8 @@ class ThumbnailDetailWidget extends StatelessWidget {
   /// Callback to navigate to the timeline (see [MainMenuWidget._tapSearchResult()]).
   final TapSearchResultCallback? tapSearchResult;
 
-  ThumbnailDetailWidget(this.timelineEntry,
-      {this.hasDivider = true, this.tapSearchResult, Key? key})
-      : super(key: key);
+  const ThumbnailDetailWidget(this.timelineEntry,
+      {this.hasDivider = true, this.tapSearchResult, super.key});
 
 
   /// Use [Material] & [InkWell] to show a Material Design ripple effect on the row.
@@ -60,7 +58,7 @@ class ThumbnailDetailWidget extends StatelessWidget {
                     ThumbnailWidget(timelineEntry),
                     Expanded(
                         child: Container(
-                      margin: EdgeInsets.only(left: 17.0),
+                      margin: const EdgeInsets.only(left: 17.0),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

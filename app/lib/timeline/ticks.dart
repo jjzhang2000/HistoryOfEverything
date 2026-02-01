@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:timeline/timeline/timeline.dart';
 import 'package:timeline/timeline/timeline_utils.dart';
@@ -12,14 +11,14 @@ import 'package:timeline/timeline/timeline_utils.dart';
 class Ticks {
   /// The following `const` variables are used to properly align, pad and layout the ticks 
   /// on the left side of the timeline.
-  static const double Margin = 20.0;
-  static const double Width = 40.0;
-  static const double LabelPadLeft = 5.0;
-  static const double LabelPadRight = 1.0;
-  static const int TickDistance = 16;
-  static const int TextTickDistance = 64;
-  static const double TickSize = 15.0;
-  static const double SmallTickSize = 5.0;
+  static const double margin = 20.0;
+  static const double width = 40.0;
+  static const double labelPadLeft = 5.0;
+  static const double labelPadRight = 1.0;
+  static const int tickDistance = 16;
+  static const int textTickDistance = 64;
+  static const double tickSize = 15.0;
+  static const double smallTickSize = 5.0;
 
   /// Other than providing the [PaintingContext] to allow the ticks to paint themselves,
   /// other relevant sizing information is passed to this `paint()` method, as well as 
@@ -29,22 +28,22 @@ class Ticks {
     final Canvas canvas = context.canvas;
 
     double bottom = height;
-    double tickDistance = TickDistance.toDouble();
-    double textTickDistance = TextTickDistance.toDouble();
+    double tickDistance = Ticks.tickDistance.toDouble();
+    double textTickDistance = Ticks.textTickDistance.toDouble();
     /// The width of the left panel can expand and contract if the favorites-view is activated,
     /// by pressing the button on the top-right corner of the timeline.
     double gutterWidth = timeline.gutterWidth;
 
     /// Calculate spacing based on current scale
     double scaledTickDistance = tickDistance * scale;
-    if (scaledTickDistance > 2 * TickDistance) {
-      while (scaledTickDistance > 2 * TickDistance && tickDistance >= 2.0) {
+    if (scaledTickDistance > 2 * Ticks.tickDistance) {
+      while (scaledTickDistance > 2 * Ticks.tickDistance && tickDistance >= 2.0) {
         scaledTickDistance /= 2.0;
         tickDistance /= 2.0;
         textTickDistance /= 2.0;
       }
     } else {
-      while (scaledTickDistance < TickDistance) {
+      while (scaledTickDistance < Ticks.tickDistance) {
         scaledTickDistance *= 2.0;
         tickDistance *= 2.0;
         textTickDistance *= 2.0;
@@ -52,7 +51,7 @@ class Ticks {
     }
     /// The number of ticks to draw.
     int numTicks = (height / scaledTickDistance).ceil() + 2;
-    if (scaledTickDistance > TextTickDistance) {
+    if (scaledTickDistance > Ticks.textTickDistance) {
       textTickDistance = tickDistance;
     }
     /// Figure out the position of the top left corner of the screen
@@ -110,10 +109,10 @@ class Ticks {
 
     } else {
       canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy, gutterWidth, height),
-          Paint()..color = Color.fromRGBO(246, 246, 246, 0.95));
+          Paint()..color = const Color.fromRGBO(246, 246, 246, 0.95));
     }
 
-    Set<String> usedValues = Set<String>();
+    Set<String> usedValues = <String>{};
 
     /// Draw all the ticks.
     for (int i = 0; i < numTicks; i++) {
@@ -127,8 +126,8 @@ class Ticks {
       if (tt % textTickDistance == 0) {
         /// Every `textTickDistance`, draw a wider tick with the a label laid on top.
         canvas.drawRect(
-            Rect.fromLTWH(offset.dx + gutterWidth - TickSize,
-                offset.dy + height - o, TickSize, 1.0),
+            Rect.fromLTWH(offset.dx + gutterWidth - Ticks.tickSize,
+                offset.dy + height - o, Ticks.tickSize, 1.0),
             Paint()..color = colors.long ?? Colors.black);
         /// Drawing text to [canvas] is done by using the [ParagraphBuilder] directly.
         ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
@@ -158,16 +157,16 @@ class Ticks {
         builder.addText(label);
         ui.Paragraph tickParagraph = builder.build();
         tickParagraph.layout(ui.ParagraphConstraints(
-            width: gutterWidth - LabelPadLeft - LabelPadRight));
+            width: gutterWidth - Ticks.labelPadLeft - Ticks.labelPadRight));
         canvas.drawParagraph(
             tickParagraph,
-            Offset(offset.dx + LabelPadLeft - LabelPadRight,
+            Offset(offset.dx + Ticks.labelPadLeft - Ticks.labelPadRight,
                 offset.dy + height - o - tickParagraph.height - 5));
       } else {
         /// If we're within two text-ticks, just draw a smaller line.
         canvas.drawRect(
-            Rect.fromLTWH(offset.dx + gutterWidth - SmallTickSize,
-                offset.dy + height - o, SmallTickSize, 1.0),
+            Rect.fromLTWH(offset.dx + gutterWidth - Ticks.smallTickSize,
+                offset.dy + height - o, Ticks.smallTickSize, 1.0),
             Paint()..color = colors.short ?? Colors.black);
       }
       startingTickMarkValue += tickDistance;

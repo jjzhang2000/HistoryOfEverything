@@ -18,6 +18,7 @@
 ///   height: 100,
 /// )
 /// ```
+library;
 
 export 'animated_favorite_button.dart';
 export 'animation_placeholder.dart';

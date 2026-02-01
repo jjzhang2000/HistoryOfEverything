@@ -9,25 +9,29 @@ import 'package:timeline/main_menu/main_menu.dart';
 /// to access other components throughout the hierarchy without the need
 /// to pass those references around.
 class TimelineApp extends StatelessWidget {
+  const TimelineApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return BlocProvider(
+      platform: Theme.of(context).platform,
       child: MaterialApp(
         title: 'History & Future of Everything',
         theme: ThemeData(scaffoldBackgroundColor: background),
-        home: MenuPage(),
+        home: const MenuPage(),
       ),
-      platform: Theme.of(context).platform,
     );
   }
 }
 
 class MenuPage extends StatelessWidget {
+  const MenuPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: null, body: MainMenuWidget());
+    return const Scaffold(appBar: null, body: MainMenuWidget());
   }
 }
 
-void main() => runApp(TimelineApp());
+void main() => runApp(const TimelineApp());

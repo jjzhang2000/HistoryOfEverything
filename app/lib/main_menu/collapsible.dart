@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class Collapsible extends StatefulWidget {
   final Widget? child;
   final bool isCollapsed;
-  Collapsible({this.child, required this.isCollapsed, Key? key}) : super(key: key);
+  const Collapsible({this.child, required this.isCollapsed, super.key});
 
   @override
   State<StatefulWidget> createState() => CollapsibleState();

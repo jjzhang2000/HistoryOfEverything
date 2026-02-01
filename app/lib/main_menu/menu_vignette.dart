@@ -1,11 +1,9 @@
 import 'dart:math';
-import 'dart:ui';
 import 'dart:ui' as ui;
 
 // import 'package:flare_dart/actor_image.dart' as flare;  // TODO: Reimplement with Rive
 // import 'package:flare_dart/math/aabb.dart' as flare;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 // import 'package:nima/nima/actor_image.dart' as nima;  // TODO: Reimplement with Rive
 // import 'package:nima/nima/math/aabb.dart' as nima;
@@ -24,8 +22,7 @@ class MenuVignette extends LeafRenderObjectWidget {
   /// Also makes the sub-section more readable.
   final Color gradientColor;
 
-  MenuVignette({Key? key, required this.gradientColor, required this.isActive, required this.assetId})
-      : super(key: key);
+  const MenuVignette({super.key, required this.gradientColor, required this.isActive, required this.assetId});
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -113,7 +110,7 @@ class MenuVignetteRenderObject extends RenderBox {
   bool get sizedByParent => true;
 
   @override
-  bool hitTestSelf(Offset screenOffset) => true;
+  bool hitTestSelf(Offset position) => true;
 
   @override
   void performResize() {

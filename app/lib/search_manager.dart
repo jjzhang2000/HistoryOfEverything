@@ -61,7 +61,7 @@ class SearchManager {
           if (_queryMap.containsKey(substring)) {
             _queryMap[substring]!.add(e);
           } else {
-            _queryMap.putIfAbsent(substring, () => Set.from([e]));
+            _queryMap.putIfAbsent(substring, () => {e});
           }
         }
       }
@@ -75,9 +75,9 @@ class SearchManager {
     // Normalize query to lowercase for case-insensitive search
     final normalizedQuery = query.toLowerCase();
     
-    if (_queryMap.containsKey(normalizedQuery))
+    if (_queryMap.containsKey(normalizedQuery)) {
       return _queryMap[normalizedQuery]!;
-    else if (normalizedQuery.isNotEmpty) {
+    } else if (normalizedQuery.isNotEmpty) {
       return <TimelineEntry>{};
     }
     Iterable<String> keys = _queryMap.keys;

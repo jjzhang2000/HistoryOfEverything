@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:timeline/main_menu/menu_data.dart';
 // TODO: Replace with Rive or other animation library
 // import "package:flare_flutter/flare_actor.dart" as flare;
 import 'package:timeline/main_menu/menu_vignette.dart';
 
-typedef NavigateTo(MenuItemData item);
+typedef NavigateTo = Function(MenuItemData item);
 
 /// This widget displays the single menu section of the [MainMenuWidget].
 ///
@@ -24,10 +23,9 @@ class MenuSection extends StatefulWidget {
   final NavigateTo navigateTo;
   final bool isActive;
 
-  MenuSection(this.title, this.backgroundColor, this.accentColor,
+  const MenuSection(this.title, this.backgroundColor, this.accentColor,
       this.menuOptions, this.navigateTo, this.isActive,
-      {this.assetId, Key? key})
-      : super(key: key);
+      {this.assetId, super.key});
 
   @override
   State<StatefulWidget> createState() => _SectionState();
@@ -138,12 +136,12 @@ class _SectionState extends State<MenuSection>
                               Container(
                                 height: 21.0,
                                 width: 21.0,
-                                margin: EdgeInsets.all(18.0),
+                                margin: const EdgeInsets.all(18.0),
 
                                 /// TODO: Replace with Rive or other animation widget
                                 /// Another [FlareActor] widget that
                                 /// you can experiment with here: https://www.2dimensions.com/a/pollux/files/flare/expandcollapse/preview
-                                child: Container(
+                                child: SizedBox(
                                     width: 21.0,
                                     height: 21.0,
                                     child: Icon(
@@ -165,10 +163,9 @@ class _SectionState extends State<MenuSection>
                           axisAlignment: 0.0,
                           axis: Axis.vertical,
                           sizeFactor: _sizeAnimation,
-                          child: Container(
-                              child: Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 56.0, right: 20.0, top: 10.0),
+                          child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 56.0, right: 20.0, top: 10.0),
                                   child: Column(
                                       children: widget.menuOptions.map((item) {
                                     return GestureDetector(
@@ -180,7 +177,7 @@ class _SectionState extends State<MenuSection>
                                             children: [
                                               Expanded(
                                                   child: Container(
-                                                      margin: EdgeInsets.only(
+                                                      margin: const EdgeInsets.only(
                                                           bottom: 20.0),
                                                       child: Text(
                                                         item.label!,
@@ -199,7 +196,7 @@ class _SectionState extends State<MenuSection>
                                                       height: 22.0,
                                                       width: 22.0))
                                             ]));
-                                  }).toList()))))
+                                  }).toList())))
                     ]),
                   ],
                 ))));

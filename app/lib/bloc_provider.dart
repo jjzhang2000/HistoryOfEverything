@@ -16,14 +16,13 @@ class BlocProvider extends InheritedWidget {
   /// Once those entries have been loaded, load also all the favorites.
   /// Lastly use the entries' references to load a local dictionary for the [SearchManager].
   BlocProvider(
-      {Key? key,
+      {super.key,
       FavoritesBloc? fb,
       Timeline? t,
-      required Widget child,
+      required super.child,
       TargetPlatform platform = TargetPlatform.iOS})
       : timeline = t ?? Timeline(platform),
-        favoritesBloc = fb ?? FavoritesBloc(),
-        super(key: key, child: child) {
+        favoritesBloc = fb ?? FavoritesBloc() {
     timeline
         .loadFromBundle("assets/timeline.json")
         .then((List<TimelineEntry> entries) {

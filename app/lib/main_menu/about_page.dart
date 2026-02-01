@@ -11,6 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 /// This page uses the package `url_launcher` available at https://pub.dartlang.org/packages/url_launcher
 /// to open up urls in a WebView on both iOS & Android.
 class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
+
   /// Sanity check before opening up the url.
   _launchUrl(String url) async {
     final uri = Uri.parse(url);
@@ -29,8 +31,8 @@ class AboutPage extends StatelessWidget {
           elevation: 0.0,
           leading: IconButton(
             alignment: Alignment.centerLeft,
-            icon: Icon(Icons.arrow_back),
-            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+            icon: const Icon(Icons.arrow_back),
+            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
             color: Colors.black.withValues(alpha: 0.5),
             onPressed: () {
               Navigator.pop(context, true);
@@ -46,7 +48,7 @@ class AboutPage extends StatelessWidget {
                   color: darkText.withValues(alpha: darkText.a * 0.75))),
         ),
         body: Padding(
-          padding: EdgeInsets.only(top: 30, bottom: 20, left: 20, right: 20),
+          padding: const EdgeInsets.only(top: 30, bottom: 20, left: 20, right: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -79,52 +81,52 @@ class AboutPage extends StatelessWidget {
                             fontSize: 17.0,
                             height: 1.5),
                         children: [
-                      TextSpan(
+                      const TextSpan(
                         text: "The History of Everything is built with ",
                       ),
                       TextSpan(
                           text: "Flutter",
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap =
                                 () => _launchUrl("https://www.flutter.io")),
-                      TextSpan(
+                      const TextSpan(
                         text: " by ",
                       ),
                       TextSpan(
                           text: "2Dimensions",
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () =>
                                 _launchUrl("https://www.2dimensions.com")),
-                      TextSpan(
+                      const TextSpan(
                         text:
                             ". The graphics and animations were created using tools by ",
                       ),
                       TextSpan(
                           text: "2Dimensions",
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () =>
                                 _launchUrl("https://www.2dimensions.com")),
-                      TextSpan(
+                      const TextSpan(
                         text: ".\n\nInspired by the Kurzgesagt video ",
                       ),
                       TextSpan(
                           text: "The History & Future of Everything",
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () => _launchUrl(
                                 "https://www.youtube.com/watch?v=5TbUxGZtwGI")),
-                      TextSpan(
+                      const TextSpan(
                         text: ".",
                       )
                     ]))
@@ -140,7 +142,7 @@ class AboutPage extends StatelessWidget {
               GestureDetector(
                 onTap: () => _launchUrl("https://www.2dimensions.com"),
                 child: Padding(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 30.0),
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 30.0),
                     child: Image.asset(
                       "assets/twoDimensions_logo.png",
                       height: 16.0,
@@ -157,7 +159,7 @@ class AboutPage extends StatelessWidget {
               GestureDetector(
                 onTap: () => _launchUrl("https://www.flutter.io"),
                 child: Padding(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 20.0),
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                     child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [

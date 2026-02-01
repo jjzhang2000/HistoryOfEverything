@@ -78,6 +78,7 @@ class TimelineFlare extends TimelineAnimatedAsset {
 }
 
 /// A label for [TimelineEntry].
+// ignore: constant_identifier_names
 enum TimelineEntryType { Era, Incident }
 
 /// Each entry in the timeline is represented by an instance of this object.
@@ -156,7 +157,7 @@ class TimelineEntry {
     if (start == null) {
       return "Unknown Ago";
     }
-    return TimelineEntry.formatYears(start) + " Ago";
+    return "${TimelineEntry.formatYears(start)} Ago";
   }
 
   /// Debug information.
@@ -173,17 +174,17 @@ class TimelineEntry {
     if (valueAbs >= 1000000000) {
       double v = valueAbs / 1000000000.0;
 
-      label = v.toStringAsFixed(v == v.floorToDouble() ? 0 : 1) + " Billion";
+      label = "${v.toStringAsFixed(v == v.floorToDouble() ? 0 : 1)} Billion";
     } else if (valueAbs >= 1000000) {
       double v = valueAbs / 1000000.0;
-      label = v.toStringAsFixed(v == v.floorToDouble() ? 0 : 1) + " Million";
+      label = "${v.toStringAsFixed(v == v.floorToDouble() ? 0 : 1)} Million";
     } else if (valueAbs >= 10000) // N.B. < 10,000
     {
       double v = valueAbs / 1000.0;
-      label = v.toStringAsFixed(v == v.floorToDouble() ? 0 : 0) + " Thousand";
+      label = "${v.toStringAsFixed(v == v.floorToDouble() ? 0 : 0)} Thousand";
     } else {
       label = valueAbs.toStringAsFixed(0);
     }
-    return label + " Years";
+    return "$label Years";
   }
 }

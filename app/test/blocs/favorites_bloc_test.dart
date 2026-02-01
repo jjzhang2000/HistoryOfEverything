@@ -44,7 +44,7 @@ void main() {
     test('init should load favorites from SharedPreferences', () async {
       // Pre-populate SharedPreferences with favorites
       SharedPreferences.setMockInitialValues({
-        FavoritesBloc.FAVORITES_KEY: ['Big Bang', 'Humans'],
+        FavoritesBloc.favoritesKey: ['Big Bang', 'Humans'],
       });
 
       await favoritesBloc.init(testEntries);
@@ -57,7 +57,7 @@ void main() {
     test('init should sort favorites by start time', () async {
       // Pre-populate with favorites in reverse order
       SharedPreferences.setMockInitialValues({
-        FavoritesBloc.FAVORITES_KEY: ['Humans', 'Dinosaurs', 'Big Bang'],
+        FavoritesBloc.favoritesKey: ['Humans', 'Dinosaurs', 'Big Bang'],
       });
 
       await favoritesBloc.init(testEntries);
@@ -76,7 +76,7 @@ void main() {
 
     test('init should ignore non-existent favorites', () async {
       SharedPreferences.setMockInitialValues({
-        FavoritesBloc.FAVORITES_KEY: ['Big Bang', 'NonExistent'],
+        FavoritesBloc.favoritesKey: ['Big Bang', 'NonExistent'],
       });
 
       await favoritesBloc.init(testEntries);
@@ -157,7 +157,7 @@ void main() {
 
       // Verify saved to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      final savedFavs = prefs.getStringList(FavoritesBloc.FAVORITES_KEY);
+      final savedFavs = prefs.getStringList(FavoritesBloc.favoritesKey);
       
       expect(savedFavs, isNotNull);
       expect(savedFavs, contains('Big Bang'));
@@ -175,7 +175,7 @@ void main() {
       favoritesBloc.removeFavorite(entry1);
 
       final prefs = await SharedPreferences.getInstance();
-      final savedFavs = prefs.getStringList(FavoritesBloc.FAVORITES_KEY);
+      final savedFavs = prefs.getStringList(FavoritesBloc.favoritesKey);
       
       expect(savedFavs, isNotNull);
       expect(savedFavs, isNot(contains('Big Bang')));

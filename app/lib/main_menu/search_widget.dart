@@ -10,8 +10,7 @@ class SearchWidget extends StatelessWidget {
   final FocusNode _searchFocusNode;
   final TextEditingController _searchController;
 
-  SearchWidget(this._searchFocusNode, this._searchController, {Key? key})
-      : super(key: key);
+  const SearchWidget(this._searchFocusNode, this._searchController, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +40,10 @@ class SearchWidget extends StatelessWidget {
                 fontFamily: "Roboto",
                 color: darkText.withValues(alpha: darkText.a * 0.5)
               ),
-              prefixIcon: Icon(Icons.search),
+              prefixIcon: const Icon(Icons.search),
               suffixIcon: _searchFocusNode.hasFocus
                   ? IconButton(
-                      icon: Icon(Icons.cancel),
+                      icon: const Icon(Icons.cancel),
                       onPressed: () {
                         _searchFocusNode.unfocus();
                         _searchController.clear();

@@ -12,10 +12,10 @@ import 'package:timeline/timeline/timeline_entry.dart';
 /// It stores a reference to the [TimelineEntry] that contains the relevant information.
 class ArticleWidget extends StatefulWidget {
   final TimelineEntry article;
-  const ArticleWidget({required this.article, Key? key}) : super(key: key);
+  const ArticleWidget({required this.article, super.key});
 
   @override
-  _ArticleWidgetState createState() => _ArticleWidgetState();
+  State<ArticleWidget> createState() => _ArticleWidgetState();
 }
 
 /// The [State] for the [ArticleWidget] will change based on the [article]
@@ -89,7 +89,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
       img: style,
       blockSpacing: 20.0,
       listIndent: 20.0,
-      blockquotePadding: EdgeInsets.all(20.0),
+      blockquotePadding: const EdgeInsets.all(20.0),
     );
     setState(() {
       _title = widget.article.label;
@@ -123,17 +123,17 @@ class _ArticleWidgetState extends State<ArticleWidget> {
         (TimelineEntry te) => te.label.toLowerCase() == _title.toLowerCase());
     return Scaffold(
         body: Container(
-            color: Color.fromRGBO(255, 255, 255, 1),
+            color: const Color.fromRGBO(255, 255, 255, 1),
             child: Stack(children: <Widget>[
               Column(children: <Widget>[
                 Container(height: devicePadding.top),
-                Container(
+                SizedBox(
                     height: 56.0,
                     width: double.infinity,
                     child: IconButton(
                       alignment: Alignment.centerLeft,
-                      icon: Icon(Icons.arrow_back),
-                      padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                      icon: const Icon(Icons.arrow_back),
+                      padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                       color: Colors.black.withValues(alpha: 0.5),
                       onPressed: () {
                         Navigator.pop(context, true);
@@ -142,7 +142,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
                 Expanded(
                     child: SingleChildScrollView(
                         padding:
-                            EdgeInsets.only(left: 20, right: 20, bottom: 30),
+                            const EdgeInsets.only(left: 20, right: 20, bottom: 30),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -162,14 +162,14 @@ class _ArticleWidgetState extends State<ArticleWidget> {
                                     _interactOffset = null;
                                   });
                                 },
-                                child: Container(
+                                child: SizedBox(
                                     height: 280,
                                     child: TimelineEntryWidget(
                                         isActive: true,
                                         timelineEntry: widget.article,
                                         interactOffset: _interactOffset))),
                             Padding(
-                              padding: EdgeInsets.only(top: 30.0),
+                              padding: const EdgeInsets.only(top: 30.0),
                               child: Row(children: [
                                 Expanded(
                                   child: Column(
@@ -214,13 +214,13 @@ class _ArticleWidgetState extends State<ArticleWidget> {
                               ]),
                             ),
                             Container(
-                                margin: EdgeInsets.only(top: 20, bottom: 20),
+                                margin: const EdgeInsets.only(top: 20, bottom: 20),
                                 height: 1,
                                 color: Colors.black.withValues(alpha: 0.11)),
                             MarkdownBody(
                                 data: _articleMarkdown,
                                 styleSheet: _markdownStyleSheet!),
-                            SizedBox(height: 100),
+                            const SizedBox(height: 100),
                           ],
                         )))
               ])

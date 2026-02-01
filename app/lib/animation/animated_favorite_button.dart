@@ -7,14 +7,14 @@ class AnimatedFavoriteButton extends StatefulWidget {
   final Color? color;
 
   const AnimatedFavoriteButton({
-    Key? key,
+    super.key,
     required this.isFavorite,
     required this.onTap,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
-  _AnimatedFavoriteButtonState createState() => _AnimatedFavoriteButtonState();
+  State<AnimatedFavoriteButton> createState() => _AnimatedFavoriteButtonState();
 }
 
 class _AnimatedFavoriteButtonState extends State<AnimatedFavoriteButton>
@@ -77,11 +77,11 @@ class HeartIconButton extends StatelessWidget {
   final Color? color;
 
   const HeartIconButton({
-    Key? key,
+    super.key,
     required this.isActive,
     required this.onTap,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

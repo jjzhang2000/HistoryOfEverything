@@ -1,9 +1,7 @@
 import "dart:async";
 import "dart:io";
 
-import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
-import "package:flutter/widgets.dart";
 import "package:share_plus/share_plus.dart";
 import 'package:timeline/bloc_provider.dart';
 import 'package:timeline/main_menu/collapsible.dart';
@@ -26,10 +24,10 @@ import 'package:timeline/timeline/timeline_widget.dart';
 /// and it'll provide on the bottom three links for quick access to your Favorites,
 /// a Share Menu and the About Page.
 class MainMenuWidget extends StatefulWidget {
-  MainMenuWidget({Key? key}) : super(key: key);
+  const MainMenuWidget({super.key});
 
   @override
-  _MainMenuWidgetState createState() => _MainMenuWidgetState();
+  State<MainMenuWidget> createState() => _MainMenuWidgetState();
 }
 
 class _MainMenuWidgetState extends State<MainMenuWidget> {
@@ -106,6 +104,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
     });
   }
 
+  @override
   initState() {
     super.initState();
 
@@ -165,7 +164,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
       tail
         ..addAll(_menu.sections
             .map<Widget>((MenuSectionData section) => Container(
-                margin: EdgeInsets.only(top: 20.0),
+                margin: const EdgeInsets.only(top: 20.0),
                 child: MenuSection(
                   section.label!,
                   section.backgroundColor!,
@@ -177,7 +176,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                 )))
             .toList(growable: false))
         ..add(Container(
-          margin: EdgeInsets.only(top: 40.0, bottom: 22),
+          margin: const EdgeInsets.only(top: 40.0, bottom: 22),
           height: 1.0,
           color: const Color.fromRGBO(151, 151, 151, 0.29),
         ))
@@ -186,7 +185,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
               _pauseSection();
               Navigator.of(context)
                   .push(MaterialPageRoute(
-                      builder: (BuildContext context) => FavoritesPage()))
+                      builder: (BuildContext context) => const FavoritesPage()))
                   .then(_restoreSection);
             },
             style: TextButton.styleFrom(
@@ -195,7 +194,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
             child:
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Container(
-                margin: EdgeInsets.only(right: 15.5),
+                margin: const EdgeInsets.only(right: 15.5),
                 child: Image.asset("assets/heart_icon.png",
                     height: 20.0,
                     width: 20.0,
@@ -211,14 +210,14 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
             ])))
         ..add(TextButton(
             onPressed: () => Share.share(
-                "Check out The History of Everything! " + (Platform.isAndroid ? "https://play.google.com/store/apps/details?id=com.twodimensions.timeline" : "itms://itunes.apple.com/us/app/apple-store/id1441257460?mt=8")),
+                "Check out The History of Everything! ${Platform.isAndroid ? "https://play.google.com/store/apps/details?id=com.twodimensions.timeline" : "itms://itunes.apple.com/us/app/apple-store/id1441257460?mt=8"}"),
             style: TextButton.styleFrom(
               backgroundColor: Colors.transparent,
             ),
             child:
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Container(
-                margin: EdgeInsets.only(right: 15.5),
+                margin: const EdgeInsets.only(right: 15.5),
                 child: Image.asset("assets/share_icon.png",
                     height: 20.0,
                     width: 20.0,
@@ -239,7 +238,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                 _pauseSection();
                 Navigator.of(context)
                     .push(MaterialPageRoute(
-                        builder: (BuildContext context) => AboutPage()))
+                        builder: (BuildContext context) => const AboutPage()))
                     .then(_restoreSection);
               },
               style: TextButton.styleFrom(
@@ -248,7 +247,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 Container(
-                  margin: EdgeInsets.only(right: 15.5),
+                  margin: const EdgeInsets.only(right: 15.5),
                   child: Image.asset("assets/info_icon.png",
                       height: 20.0,
                       width: 20.0,
@@ -278,7 +277,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
             padding: EdgeInsets.only(top: devicePadding.top),
             child: SingleChildScrollView(
                 padding:
-                    EdgeInsets.only(top: 20.0, left: 20, right: 20, bottom: 20),
+                    const EdgeInsets.only(top: 20.0, left: 20, right: 20, bottom: 20),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -304,7 +303,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                                             fontFamily: "RobotoMedium"))
                                   ])),
                           Padding(
-                              padding: EdgeInsets.only(top: 22.0),
+                              padding: const EdgeInsets.only(top: 22.0),
                               child: SearchWidget(
                                   _searchFocusNode, _searchTextController))
                         ] +

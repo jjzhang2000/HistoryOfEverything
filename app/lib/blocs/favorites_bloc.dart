@@ -9,7 +9,7 @@ import "package:timeline/timeline/timeline_entry.dart";
 /// independence. 
 /// It's available at: https://pub.dartlang.org/packages/shared_preferences
 class FavoritesBloc {
-  static const String FAVORITES_KEY = "Favorites";
+  static const String favoritesKey = "Favorites";
   final List<TimelineEntry> _favorites = [];
 
   /// This method is called during the [BlocProvider] initialization.
@@ -17,12 +17,12 @@ class FavoritesBloc {
   /// use those references to fill [_favorites].
   init(List<TimelineEntry> entries) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? favs = prefs.getStringList(FavoritesBloc.FAVORITES_KEY);
+    List<String>? favs = prefs.getStringList(FavoritesBloc.favoritesKey);
     /// A [Map] is used to optimize retrieval times when checking if a favorite
     /// is already present - in fact the label's used as the key.
     /// Checking if an element is in the map is O(1), making this process O(n)
     /// with n entries.
-    Map<String, TimelineEntry> entriesMap = Map();
+    Map<String, TimelineEntry> entriesMap = {};
     for (TimelineEntry e in entries) {
       entriesMap.putIfAbsent(e.label, () => e);
     }
@@ -47,7 +47,7 @@ class FavoritesBloc {
   /// Save [e] into the list, re-sort it, and store to disk.
   addFavorite(TimelineEntry e) {
     if (!_favorites.contains(e)) {
-      this._favorites.add(e);
+      _favorites.add(e);
       _favorites.sort((TimelineEntry a, TimelineEntry b) {
         return a.start!.compareTo(b.start!);
       });
@@ -58,7 +58,7 @@ class FavoritesBloc {
   /// Remove the entry and save to disk.
   removeFavorite(TimelineEntry e) {
     if (_favorites.contains(e)) {
-      this._favorites.remove(e);
+      _favorites.remove(e);
       _save();
     }
   }
@@ -68,7 +68,7 @@ class FavoritesBloc {
     SharedPreferences.getInstance().then((SharedPreferences prefs) {
       List<String> favsList =
           _favorites.map((TimelineEntry en) => en.label).toList();
-      prefs.setStringList(FavoritesBloc.FAVORITES_KEY, favsList);
+      prefs.setStringList(FavoritesBloc.favoritesKey, favsList);
     });
   }
 }

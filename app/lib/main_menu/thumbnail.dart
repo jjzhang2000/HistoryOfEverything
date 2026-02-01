@@ -11,7 +11,7 @@ class ThumbnailWidget extends StatelessWidget {
   /// Reference to the entry to get the thumbnail image information.
   final TimelineEntry entry;
 
-  ThumbnailWidget(this.entry, {Key? key}) : super(key: key);
+  const ThumbnailWidget(this.entry, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class ThumbnailWidget extends StatelessWidget {
       );
     }
 
-    return Container(
+    return SizedBox(
         width: radius * 2,
         height: radius * 2,
         child: ClipPath(clipper: CircleClipper(), child: thumbnail));

@@ -1,5 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
 import "dart:ui" as ui;
 
 // TODO: Reimplement with Rive - Flare/Nima imports removed
@@ -9,7 +7,6 @@ import "dart:ui" as ui;
 // import 'package:flare_dart/math/mat2d.dart' as flare;
 // import 'package:flare_dart/math/vec2d.dart' as flare;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 // import 'package:nima/nima.dart' as nima;
 // import 'package:nima/nima/actor_image.dart' as nima;
@@ -32,8 +29,7 @@ class TimelineEntryWidget extends LeafRenderObjectWidget {
   final Offset? interactOffset;
 
   const TimelineEntryWidget(
-      {Key? key, required this.isActive, this.timelineEntry, this.interactOffset})
-      : super(key: key);
+      {super.key, required this.isActive, this.timelineEntry, this.interactOffset});
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -79,10 +75,12 @@ class VignetteRenderObject extends RenderBox {
   static const BoxFit fit = BoxFit.contain;
   
   bool _isActive = false;
+  // ignore: unused_field
   bool _firstUpdate = true;
   bool _isFrameScheduled = false;
   double _lastFrameTime = 0.0;
   Offset? interactOffset;
+  // ignore: unused_field
   Offset? _renderOffset;
 
   TimelineEntry? _timelineEntry;
@@ -183,7 +181,7 @@ class VignetteRenderObject extends RenderBox {
 
   @override
   void performResize() {
-    size = constraints!.biggest;
+    size = constraints.biggest;
   }
 
   /// This overridden method is where we can implement our custom logic, for
@@ -240,6 +238,7 @@ class VignetteRenderObject extends RenderBox {
     }
 
     /// Calculate the elapsed time to [advance()] the animations.
+    // ignore: unused_local_variable
     double elapsed = t - _lastFrameTime;
     _lastFrameTime = t;
     // TODO: Reimplement Nima/Flare animation with Rive

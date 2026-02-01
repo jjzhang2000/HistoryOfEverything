@@ -1,6 +1,5 @@
 // TODO: Replace with Rive or other animation library
 // import 'package:flare_flutter/flare_actor.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:timeline/bloc_provider.dart';
 import 'package:timeline/colors.dart';
@@ -16,6 +15,8 @@ import 'package:timeline/timeline/timeline_widget.dart';
 /// 
 /// To add any item as favorite, go to the [ArticleWidget] and tap on the heart button.
 class FavoritesPage extends StatelessWidget {
+  const FavoritesPage({super.key});
+
   
   /// This widget displays a [ListView] for all the elements in the favorites.
   @override
@@ -53,8 +54,8 @@ class FavoritesPage extends StatelessWidget {
           centerTitle: false,
           leading: IconButton(
             alignment: Alignment.centerLeft,
-            icon: Icon(Icons.arrow_back),
-            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+            icon: const Icon(Icons.arrow_back),
+            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
             color: Colors.black.withValues(alpha: 0.5),
             onPressed: () {
               Navigator.pop(context, true);
@@ -80,17 +81,17 @@ class FavoritesPage extends StatelessWidget {
                           Container(
                               width: 128.0,
                               height: 114.0,
-                              margin: EdgeInsets.only(bottom: 30),
+                              margin: const EdgeInsets.only(bottom: 30),
                               // TODO: Replace with Rive or other animation widget
                             // child: FlareActor("assets/Broken Heart.flr",
                             //       animation: "Heart Break", shouldClip: false)
-                            child: Icon(
+                            child: const Icon(
                               Icons.heart_broken,
                               size: 64.0,
                               color: Colors.grey,
                             )),
                           Container(
-                            padding: EdgeInsets.only(bottom: 21),
+                            padding: const EdgeInsets.only(bottom: 21),
                             width: 250,
                             child: Text("You haven’t favorited anything yet.",
                                 textAlign: TextAlign.center,
@@ -104,7 +105,7 @@ class FavoritesPage extends StatelessWidget {
                           ),
                           Container(
                             width: 270,
-                            margin: EdgeInsets.only(bottom: 114),
+                            margin: const EdgeInsets.only(bottom: 114),
                             child: Text(
                                 "Browse to an event in the timeline and tap on the heart icon to save something in this list.",
                                 textAlign: TextAlign.center,

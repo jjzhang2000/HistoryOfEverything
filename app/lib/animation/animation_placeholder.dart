@@ -12,14 +12,14 @@ class AnimationPlaceholder extends StatelessWidget {
   final bool useStaticImage;
 
   const AnimationPlaceholder({
-    Key? key,
+    super.key,
     this.assetName,
     this.width = 100.0,
     this.height = 100.0,
     this.fit = BoxFit.contain,
     this.alignment = Alignment.center,
     this.useStaticImage = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -130,10 +130,10 @@ class TimelineAssetPlaceholder extends StatelessWidget {
   final double opacity;
 
   const TimelineAssetPlaceholder({
-    Key? key,
+    super.key,
     this.filename,
     this.opacity = 1.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
