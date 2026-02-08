@@ -10,6 +10,7 @@ import 'package:timeline/timeline/timeline_entry.dart';
 class BlocProvider extends InheritedWidget {
   final FavoritesBloc favoritesBloc;
   final Timeline timeline;
+  final SearchManager searchManager;
 
   /// This widget is initialized when the app boots up, and thus loads the resources.
   /// The timeline.json file contains all the entries' data.
@@ -19,25 +20,38 @@ class BlocProvider extends InheritedWidget {
       {super.key,
       FavoritesBloc? fb,
       Timeline? t,
+      SearchManager? sm,
       required super.child,
       TargetPlatform platform = TargetPlatform.iOS})
       : timeline = t ?? Timeline(platform),
-        favoritesBloc = fb ?? FavoritesBloc() {
+        favoritesBloc = fb ?? FavoritesBloc(),
+        searchManager = sm ?? SearchManager.init() {
+    _initializeData();
+  }
+
+  /// Initialize data by loading timeline entries, favorites, and search index
+  void _initializeData() {
     timeline
         .loadFromBundle("assets/timeline.json")
         .then((List<TimelineEntry> entries) {
       if (entries.isEmpty) return;
+      
+      // Initialize timeline viewport
       timeline.setViewport(
           start: entries.first.start! * 2.0,
           end: entries.first.start!,
           animate: true);
-      /// Advance the timeline to its starting position.
       timeline.advance(0.0, false);
 
-      /// All the entries are loaded, we can fill in the [favoritesBloc]...
+      // Initialize favorites
       favoritesBloc.init(entries);
-      /// ...and initialize the [SearchManager].
-      SearchManager.init(entries);
+      
+      // Initialize search manager
+      searchManager.init(entries);
+    })
+    .catchError((error) {
+      print('Error loading timeline: $error');
+      // Handle error gracefully - can show a user-friendly error message
     });
   }
 
@@ -58,5 +72,13 @@ class BlocProvider extends InheritedWidget {
     BlocProvider? bp =
         context.dependOnInheritedWidgetOfExactType<BlocProvider>();
     return bp?.timeline;
+  }
+
+  /// static accessor for the [SearchManager]. 
+  /// e.g. [SearchWidget] uses this static getter to perform search operations.
+  static SearchManager? getSearchManager(BuildContext context) {
+    BlocProvider? bp =
+        context.dependOnInheritedWidgetOfExactType<BlocProvider>();
+    return bp?.searchManager;
   }
 }

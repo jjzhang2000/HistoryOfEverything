@@ -15,8 +15,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # Using static images instead of Flare/Nima/Rive animations
-  # rive: ^0.13.20
+  # Add Rive animation support
+  rive: ^0.13.20
   flutter_markdown: ^0.6.18
   share_plus: ^7.2.1
   intl: ^0.18.1

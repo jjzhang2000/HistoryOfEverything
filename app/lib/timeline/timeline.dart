@@ -4,19 +4,10 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-// Flare/Nima imports commented out for null safety migration
-// import 'package:flare_flutter/flare.dart' as flare;
-// import 'package:flare_dart/animation/actor_animation.dart' as flare;
-// import 'package:flare_dart/math/aabb.dart' as flare;
-// import 'package:flare_dart/math/vec2d.dart' as flare;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart' show rootBundle;
-// import 'package:nima/nima.dart' as nima;
-// import 'package:nima/nima/actor_image.dart' as nima;
-// import 'package:nima/nima/animation/actor_animation.dart' as nima;
-// import 'package:nima/nima/math/aabb.dart' as nima;
-// import 'package:nima/nima/math/vec2d.dart' as nima;
+import 'package:rive/rive.dart';
 import 'package:timeline/timeline/timeline_utils.dart';
 
 import 'timeline_entry.dart';
@@ -129,13 +120,6 @@ class Timeline {
   late List<TimelineAsset> _renderAssets;
 
   final Map<String, TimelineEntry> _entriesById = <String, TimelineEntry>{};
-  // Nima/Flare resources commented out for null safety migration
-  // Map<String, nima.FlutterActor> _nimaResources = <String, nima.FlutterActor>{};
-  // Map<String, flare.FlutterActor> _flareResources = <String, flare.FlutterActor>{};
-  // ignore: unused_field
-  final Map<String, dynamic> _nimaResources = <String, dynamic>{};
-  // ignore: unused_field
-  final Map<String, dynamic> _flareResources = <String, dynamic>{};
 
   /// Callback set by [TimelineRenderWidget] when adding a reference to this object.
   /// It'll trigger [RenderBox.markNeedsPaint()].
@@ -261,13 +245,14 @@ class Timeline {
   /// This function will load and decode `timline.json` from disk,
   /// decode the JSON file, and populate all the [TimelineEntry]s.
   Future<List<TimelineEntry>> loadFromBundle(String filename) async {
-    String data = await rootBundle.loadString(filename);
-    List jsonEntries = json.decode(data) as List;
+    try {
+      String data = await rootBundle.loadString(filename);
+      List jsonEntries = json.decode(data) as List;
 
-    List<TimelineEntry> allEntries = <TimelineEntry>[];
-    _backgroundColors = <TimelineBackgroundColor>[];
-    _tickColors = <TickColors>[];
-    _headerColors = <HeaderColors>[];
+      List<TimelineEntry> allEntries = <TimelineEntry>[];
+      _backgroundColors = <TimelineBackgroundColor>[];
+      _tickColors = <TickColors>[];
+      _headerColors = <HeaderColors>[];
 
     /// The JSON decode doesn't provide strong typing, so we'll iterate
     /// on the dynamic entries in the [jsonEntries] list.
@@ -437,57 +422,33 @@ class Timeline {
         String source = assetMap["source"];
         String filename = "assets/$source";
         String? extension = getExtension(source);
+        
         /// Instantiate the correct object based on the file extension.
-        switch (extension) {
-          // Flare asset loading commented out for null safety migration
-          case "flr":
-            // TimelineFlare flareAsset = TimelineFlare();
-            // asset = flareAsset;
-            // flare.FlutterActor actor = _flareResources[filename];
-            // if (actor == null) {
-            //   actor = flare.FlutterActor();
-            //   bool success = await actor.loadFromBundle(rootBundle, filename);
-            //   if (success) {
-            //     _flareResources[filename] = actor;
-            //   }
-            // }
-            // if (actor != null) {
-            //   flareAsset.actorStatic = actor.artboard;
-            //   flareAsset.actorStatic.initializeGraphics();
-            //   flareAsset.actor = actor.artboard.makeInstance();
-            //   flareAsset.actor.initializeGraphics();
-            //   flareAsset.animation = actor.artboard.animations[0];
-            //   ...
-            // }
-            // Skip Flare assets for now
-            continue;
-          // Nima asset loading commented out for null safety migration
-          case "nma":
-            // TimelineNima nimaAsset = TimelineNima();
-            // asset = nimaAsset;
-            // nima.FlutterActor actor = _nimaResources[filename];
-            // if (actor == null) {
-            //   actor = nima.FlutterActor();
-            //   bool success = await actor.loadFromBundle(filename);
-            //   if (success) {
-            //     _nimaResources[filename] = actor;
-            //   }
-            // }
-            // Skip Nima assets for now
-            continue;
+        if (extension == "riv") {
+          /// Load Rive animation assets
+          TimelineRive riveAsset = TimelineRive();
+          asset = riveAsset;
 
-          default:
-            /// Legacy fallback case: some elements could have been just images.
-            TimelineImage imageAsset = TimelineImage();
-            asset = imageAsset;
+          ByteData data = await rootBundle.load(filename);
+          final riveFile = RiveFile.import(data);
+          final artboard = riveFile.mainArtboard;
+          riveAsset.artboard = artboard;
+          
+          /// Add animation controller if there are animations
+          if (artboard.animations.isNotEmpty) {
+            riveAsset.controller = SimpleAnimation(artboard.animations.first.name);
+            artboard.addController(riveAsset.controller!);
+          }
+        } else {
+          /// Load image assets
+          TimelineImage imageAsset = TimelineImage();
+          asset = imageAsset;
 
-            ByteData data = await rootBundle.load(filename);
-            Uint8List list = Uint8List.view(data.buffer);
-            ui.Codec codec = await ui.instantiateImageCodec(list);
-            ui.FrameInfo frame = await codec.getNextFrame();
-            imageAsset.image = frame.image;
-
-            break;
+          ByteData data = await rootBundle.load(filename);
+          Uint8List list = Uint8List.view(data.buffer);
+          ui.Codec codec = await ui.instantiateImageCodec(list);
+          ui.FrameInfo frame = await codec.getNextFrame();
+          imageAsset.image = frame.image;
         }
 
         double scale = 1.0;
@@ -561,6 +522,11 @@ class Timeline {
       }
     }
     return allEntries;
+    } catch (e) {
+      print('Error loading timeline from bundle: $e');
+      // Return empty list on error
+      return <TimelineEntry>[];
+    }
   }
 
   /// Helper function for [MenuVignette].
@@ -1200,20 +1166,14 @@ class Timeline {
 
           _lastAssetY = targetAssetY +
               asset.height * assetScreenScale + assetPadding;
-          // Nima/Flare animation logic commented out for null safety migration
-          // if (asset is TimelineNima) {
-          //   _lastAssetY += asset.gap;
-          // } else if (asset is TimelineFlare) {
-          //   _lastAssetY += asset.gap;
-          // }
           if (asset.y > _height ||
               asset.y + asset.height * assetScreenScale < 0.0) {
             /// It's not in view: cull it.
-            // Animation culling logic commented out
           } else {
-            /// Item is in view - animation logic commented out for null safety migration
-            // if (asset is TimelineNima && isActive) { ... }
-            // if (asset is TimelineFlare && isActive) { ... }
+            /// Update Rive animation if it's a Rive asset
+            if (asset is TimelineRive && asset.artboard != null) {
+              asset.artboard!.advance(elapsed);
+            }
             /// Add this asset to the list of rendered assets.
             renderAssets.add(item.asset!);
           }

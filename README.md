@@ -4,7 +4,17 @@ This project was originally cloned from https://github.com/2d-inc/HistoryOfEvery
 
 1. Make it work with current Flutter version
 2. Upgrade the dependent packages
-3. Make it the fundamental of a group of new apps, most of which are still in my mind and will tyr in the future
+3. Make it the fundamental of a group of new apps, most of which are still in my mind and will try in the future
+
+## Recent Improvements
+
+1. **Dependency Management**: Cleaned up unused dependencies and updated necessary packages to their latest versions
+2. **Animation Enhancement**: Integrated Rive animation library to replace deprecated Flare/Nima animations
+3. **Code Quality**: Removed all commented-out code and optimized code structure for better readability and maintainability
+4. **Error Handling**: Added comprehensive error handling mechanisms to improve app stability
+5. **Performance Optimization**: Implemented viewport clipping to optimize timeline rendering performance
+6. **Cross-platform Compatibility**: Ensured the app works correctly on all supported platforms
+7. **Code Refactoring**: Improved code structure and modularity for better maintainability
 
 Here is the original README.md:
 

@@ -624,10 +624,15 @@ class TimelineRenderObject extends RenderBox {
       List<TimelineEntry> entries, double x, double scale, int depth) {
     final Canvas canvas = context.canvas;
 
+    // Calculate viewport bounds with a small buffer
+    double viewportTop = -Timeline.defaultBubbleHeight;
+    double viewportBottom = size.height + Timeline.defaultBubbleHeight;
+
     for (TimelineEntry item in entries) {
+      // Skip items that are completely outside the viewport
       if (!item.isVisible ||
-          item.y > size.height + Timeline.defaultBubbleHeight ||
-          item.endY < -Timeline.defaultBubbleHeight) {
+          item.y > viewportBottom ||
+          item.endY < viewportTop) {
         /// Don't paint this item.
         continue;
       }
@@ -661,58 +666,66 @@ class TimelineRenderObject extends RenderBox {
             legPaint);
       }
 
-      const double maxLabelWidth = 1200.0;
-      const double bubblePadding = 20.0;
+      // Only draw bubble if it's within the viewport
+      if (item.labelY > viewportTop && item.labelY < viewportBottom) {
+        const double maxLabelWidth = 1200.0;
+        const double bubblePadding = 20.0;
 
-      /// Let the timeline calculate the height for the current item's bubble.
-      double bubbleHeight = timeline!.bubbleHeight(item);
+        /// Let the timeline calculate the height for the current item's bubble.
+        double bubbleHeight = timeline!.bubbleHeight(item);
 
-      /// Use [ui.ParagraphBuilder] to construct the label for canvas.
-      ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
-          textAlign: TextAlign.start, fontFamily: "Roboto", fontSize: 20.0))
-        ..pushStyle(
-            ui.TextStyle(color: const Color.fromRGBO(255, 255, 255, 1.0)));
+        /// Use [ui.ParagraphBuilder] to construct the label for canvas.
+        ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
+            textAlign: TextAlign.start, fontFamily: "Roboto", fontSize: 20.0))
+          ..pushStyle(
+              ui.TextStyle(color: const Color.fromRGBO(255, 255, 255, 1.0)));
 
-      builder.addText(item.label);
-      ui.Paragraph labelParagraph = builder.build();
-      labelParagraph.layout(const ui.ParagraphConstraints(width: maxLabelWidth));
+        builder.addText(item.label);
+        ui.Paragraph labelParagraph = builder.build();
+        labelParagraph.layout(const ui.ParagraphConstraints(width: maxLabelWidth));
 
-      double textWidth =
-          labelParagraph.maxIntrinsicWidth * item.opacity * item.labelOpacity;
-      double bubbleX = _timeline!.renderLabelX -
-          Timeline.depthOffset * _timeline!.renderOffsetDepth;
-      double bubbleY = item.labelY - bubbleHeight / 2.0;
+        double textWidth =
+            labelParagraph.maxIntrinsicWidth * item.opacity * item.labelOpacity;
+        double bubbleX = _timeline!.renderLabelX -
+            Timeline.depthOffset * _timeline!.renderOffsetDepth;
+        double bubbleY = item.labelY - bubbleHeight / 2.0;
 
-      canvas.save();
-      canvas.translate(bubbleX, bubbleY);
+        canvas.save();
+        canvas.translate(bubbleX, bubbleY);
 
-      /// Get the bubble's path based on its width&height, draw it, and then add the label on top.
-      Path bubble =
-          makeBubblePath(textWidth + bubblePadding * 2.0, bubbleHeight);
+        /// Get the bubble's path based on its width&height, draw it, and then add the label on top.
+        Path bubble =
+            makeBubblePath(textWidth + bubblePadding * 2.0, bubbleHeight);
 
-      canvas.drawPath(
-          bubble,
-          Paint()
-            ..color = (item.accent != null
-                    ? item.accent!
-                    : lineColors[depth % lineColors.length])
-                .withValues(alpha: item.opacity * item.labelOpacity));
-      canvas
-          .clipRect(Rect.fromLTWH(bubblePadding, 0.0, textWidth, bubbleHeight));
-      _tapTargets.add(TapTarget()
-        ..entry = item
-        ..rect = Rect.fromLTWH(
-            bubbleX, bubbleY, textWidth + bubblePadding * 2.0, bubbleHeight));
+        canvas.drawPath(
+            bubble,
+            Paint()
+              ..color = (item.accent != null
+                      ? item.accent!
+                      : lineColors[depth % lineColors.length])
+                  .withValues(alpha: item.opacity * item.labelOpacity));
+        canvas
+            .clipRect(Rect.fromLTWH(bubblePadding, 0.0, textWidth, bubbleHeight));
+        _tapTargets.add(TapTarget()
+          ..entry = item
+          ..rect = Rect.fromLTWH(
+              bubbleX, bubbleY, textWidth + bubblePadding * 2.0, bubbleHeight));
 
-      canvas.drawParagraph(
-          labelParagraph,
-          Offset(
-              bubblePadding, bubbleHeight / 2.0 - labelParagraph.height / 2.0));
-      canvas.restore();
+        canvas.drawParagraph(
+            labelParagraph,
+            Offset(
+                bubblePadding, bubbleHeight / 2.0 - labelParagraph.height / 2.0));
+        canvas.restore();
+      }
+
+      // Recursively draw children if they might be visible
       if (item.children != null) {
-        /// Draw the other elements in the hierarchy.
-        drawItems(context, offset, item.children!, x + Timeline.depthOffset,
-            scale, depth + 1);
+        // Only recurse if this item is partially visible
+        if (item.y < viewportBottom && item.endY > viewportTop) {
+          /// Draw the other elements in the hierarchy.
+          drawItems(context, offset, item.children!, x + Timeline.depthOffset,
+              scale, depth + 1);
+        }
       }
     }
   }

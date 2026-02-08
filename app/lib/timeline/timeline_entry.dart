@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:rive/rive.dart';
 
 // Flare/Nima imports commented out for null safety migration
 // import 'package:flare_flutter/flare.dart' as flare;
@@ -75,6 +76,12 @@ class TimelineFlare extends TimelineAnimatedAsset {
   dynamic idle;
   List<dynamic>? idleAnimations;
   dynamic setupAABB;
+}
+
+/// A `Rive` Asset.
+class TimelineRive extends TimelineAnimatedAsset {
+  Artboard? artboard;
+  RiveAnimationController? controller;
 }
 
 /// A label for [TimelineEntry].
