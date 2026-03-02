@@ -99,5 +99,105 @@
   "unknownAgo": "Unknown Ago",
   "@unknownAgo": {
     "description": "Unknown time ago"
+  },
+  "aboutPageTitle": "The History of\nEverything",
+  "@aboutPageTitle": {
+    "description": "Title on the about page"
+  },
+  "version": "v1.0",
+  "@version": {
+    "description": "Version number"
+  },
+  "aboutDescription1": "The History of Everything is built with ",
+  "@aboutDescription1": {
+    "description": "First part of about description"
+  },
+  "aboutDescription2": " by ",
+  "@aboutDescription2": {
+    "description": "Second part of about description"
+  },
+  "aboutDescription3": ". The graphics and animations were created using tools by ",
+  "@aboutDescription3": {
+    "description": "Third part of about description"
+  },
+  "aboutDescription4": ".\n\nInspired by the Kurzgesagt video ",
+  "@aboutDescription4": {
+    "description": "Fourth part of about description"
+  },
+  "aboutDescription5": ".",
+  "@aboutDescription5": {
+    "description": "Last part of about description"
+  },
+  "flutter": "Flutter",
+  "@flutter": {
+    "description": "Flutter framework name"
+  },
+  "twoDimensions": "2Dimensions",
+  "@twoDimensions": {
+    "description": "Company name"
+  },
+  "historyAndFutureVideo": "The History & Future of Everything",
+  "@historyAndFutureVideo": {
+    "description": "Video title that inspired the app"
+  },
+  "designedBy": "Designed by",
+  "@designedBy": {
+    "description": "Label for designer credit"
+  },
+  "builtWith": "Built with",
+  "@builtWith": {
+    "description": "Label for technology credit"
+  },
+  "universe": "Universe",
+  "@universe": {
+    "description": "Section title for universe events"
+  },
+  "earth": "Earth",
+  "@earth": {
+    "description": "Section title for earth events"
+  },
+  "life": "Life",
+  "@life": {
+    "description": "Section title for life events"
+  },
+  "humanity": "Humanity",
+  "@humanity": {
+    "description": "Section title for humanity events"
+  },
+  "showAll": "Show All",
+  "@showAll": {
+    "description": "Button text to show all items"
+  },
+  "collapse": "Collapse",
+  "@collapse": {
+    "description": "Button text to collapse section"
+  },
+  "expand": "Expand",
+  "@expand": {
+    "description": "Button text to expand section"
+  },
+  "noResults": "No results found",
+  "@noResults": {
+    "description": "Message when search returns no results"
+  },
+  "searchHint": "Search for events...",
+  "@searchHint": {
+    "description": "Placeholder text in search field"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button text"
+  },
+  "readMore": "Read More",
+  "@readMore": {
+    "description": "Read more button text"
+  },
+  "articleError": "Failed to load article",
+  "@articleError": {
+    "description": "Error message when article fails to load"
   }
 }

@@ -99,5 +99,105 @@
   "unknownAgo": "未知时间",
   "@unknownAgo": {
     "description": "Unknown time ago"
+  },
+  "aboutPageTitle": "万物的历史",
+  "@aboutPageTitle": {
+    "description": "Title on the about page"
+  },
+  "version": "v1.0",
+  "@version": {
+    "description": "Version number"
+  },
+  "aboutDescription1": "《万物的历史》使用 ",
+  "@aboutDescription1": {
+    "description": "First part of about description"
+  },
+  "aboutDescription2": " 开发，由 ",
+  "@aboutDescription2": {
+    "description": "Second part of about description"
+  },
+  "aboutDescription3": " 制作。图形和动画使用 ",
+  "@aboutDescription3": {
+    "description": "Third part of about description"
+  },
+  "aboutDescription4": " 的工具创建。\n\n灵感来源于 Kurzgesagt 视频 ",
+  "@aboutDescription4": {
+    "description": "Fourth part of about description"
+  },
+  "aboutDescription5": "。",
+  "@aboutDescription5": {
+    "description": "Last part of about description"
+  },
+  "flutter": "Flutter",
+  "@flutter": {
+    "description": "Flutter framework name"
+  },
+  "twoDimensions": "2Dimensions",
+  "@twoDimensions": {
+    "description": "Company name"
+  },
+  "historyAndFutureVideo": "万物的历史与未来",
+  "@historyAndFutureVideo": {
+    "description": "Video title that inspired the app"
+  },
+  "designedBy": "设计者",
+  "@designedBy": {
+    "description": "Label for designer credit"
+  },
+  "builtWith": "使用技术",
+  "@builtWith": {
+    "description": "Label for technology credit"
+  },
+  "universe": "宇宙",
+  "@universe": {
+    "description": "Section title for universe events"
+  },
+  "earth": "地球",
+  "@earth": {
+    "description": "Section title for earth events"
+  },
+  "life": "生命",
+  "@life": {
+    "description": "Section title for life events"
+  },
+  "humanity": "人类",
+  "@humanity": {
+    "description": "Section title for humanity events"
+  },
+  "showAll": "显示全部",
+  "@showAll": {
+    "description": "Button text to show all items"
+  },
+  "collapse": "收起",
+  "@collapse": {
+    "description": "Button text to collapse section"
+  },
+  "expand": "展开",
+  "@expand": {
+    "description": "Button text to expand section"
+  },
+  "noResults": "未找到结果",
+  "@noResults": {
+    "description": "Message when search returns no results"
+  },
+  "searchHint": "搜索事件...",
+  "@searchHint": {
+    "description": "Placeholder text in search field"
+  },
+  "close": "关闭",
+  "@close": {
+    "description": "Close button text"
+  },
+  "back": "返回",
+  "@back": {
+    "description": "Back button text"
+  },
+  "readMore": "阅读更多",
+  "@readMore": {
+    "description": "Read more button text"
+  },
+  "articleError": "文章加载失败",
+  "@articleError": {
+    "description": "Error message when article fails to load"
   }
 }

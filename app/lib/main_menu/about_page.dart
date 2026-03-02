@@ -24,6 +24,8 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Scaffold(
         appBar: AppBar(
           centerTitle: false,
@@ -41,7 +43,7 @@ class AboutPage extends StatelessWidget {
           ),
           titleSpacing:
               9.0, // Note that the icon has 20 on the right due to its padding, so we add 10 to get our desired 29
-          title: Text(AppLocalizations.of(context)?.about ?? "About",
+          title: Text(l10n?.about ?? "About",
               textAlign: TextAlign.left,
               style: TextStyle(
                   fontFamily: "RobotoMedium",
@@ -54,7 +56,7 @@ class AboutPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "The History of\nEverything",
+                l10n?.aboutPageTitle ?? "The History of\nEverything",
                 style: TextStyle(
                     fontFamily: "RobotoMedium",
                     fontSize: 34.0,
@@ -63,7 +65,7 @@ class AboutPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 17.0, bottom: 14.0),
                 child: Text(
-                  "v1.0",
+                  l10n?.version ?? "v1.0",
                   style: TextStyle(
                       fontFamily: "Roboto",
                       fontSize: 17.0,
@@ -82,58 +84,57 @@ class AboutPage extends StatelessWidget {
                             fontSize: 17.0,
                             height: 1.5),
                         children: [
-                      const TextSpan(
-                        text: "The History of Everything is built with ",
+                      TextSpan(
+                        text: l10n?.aboutDescription1 ?? "The History of Everything is built with ",
                       ),
                       TextSpan(
-                          text: "Flutter",
+                          text: l10n?.flutter ?? "Flutter",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap =
                                 () => _launchUrl("https://www.flutter.io")),
-                      const TextSpan(
-                        text: " by ",
+                      TextSpan(
+                        text: l10n?.aboutDescription2 ?? " by ",
                       ),
                       TextSpan(
-                          text: "2Dimensions",
+                          text: l10n?.twoDimensions ?? "2Dimensions",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () =>
                                 _launchUrl("https://www.2dimensions.com")),
-                      const TextSpan(
-                        text:
-                            ". The graphics and animations were created using tools by ",
+                      TextSpan(
+                        text: l10n?.aboutDescription3 ?? ". The graphics and animations were created using tools by ",
                       ),
                       TextSpan(
-                          text: "2Dimensions",
+                          text: l10n?.twoDimensions ?? "2Dimensions",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () =>
                                 _launchUrl("https://www.2dimensions.com")),
-                      const TextSpan(
-                        text: ".\n\nInspired by the Kurzgesagt video ",
+                      TextSpan(
+                        text: l10n?.aboutDescription4 ?? ".\n\nInspired by the Kurzgesagt video ",
                       ),
                       TextSpan(
-                          text: "The History & Future of Everything",
+                          text: l10n?.historyAndFutureVideo ?? "The History & Future of Everything",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () => _launchUrl(
                                 "https://www.youtube.com/watch?v=5TbUxGZtwGI")),
-                      const TextSpan(
-                        text: ".",
+                      TextSpan(
+                        text: l10n?.aboutDescription5 ?? ".",
                       )
                     ]))
               ])),
               Text(
-                "Designed by",
+                l10n?.designedBy ?? "Designed by",
                 style: TextStyle(
                     fontFamily: "Roboto",
                     fontSize: 17.0,
@@ -150,7 +151,7 @@ class AboutPage extends StatelessWidget {
                     )),
               ),
               Text(
-                "Built with",
+                l10n?.builtWith ?? "Built with",
                 style: TextStyle(
                     fontFamily: "Roboto",
                     fontSize: 17.0,
@@ -169,7 +170,7 @@ class AboutPage extends StatelessWidget {
                           Container(
                             margin: const EdgeInsets.only(left: 5.0),
                             child: Text(
-                              "Flutter",
+                              l10n?.flutter ?? "Flutter",
                               style: TextStyle(
                                   fontSize: 26.0,
                                   color: darkText

@@ -211,6 +211,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown Ago'**
   String get unknownAgo;
+
+  /// Title on the about page
+  ///
+  /// In en, this message translates to:
+  /// **'The History of\nEverything'**
+  String get aboutPageTitle;
+
+  /// Version number
+  ///
+  /// In en, this message translates to:
+  /// **'v1.0'**
+  String get version;
+
+  /// First part of about description
+  ///
+  /// In en, this message translates to:
+  /// **'The History of Everything is built with '**
+  String get aboutDescription1;
+
+  /// Second part of about description
+  ///
+  /// In en, this message translates to:
+  /// **' by '**
+  String get aboutDescription2;
+
+  /// Third part of about description
+  ///
+  /// In en, this message translates to:
+  /// **'. The graphics and animations were created using tools by '**
+  String get aboutDescription3;
+
+  /// Fourth part of about description
+  ///
+  /// In en, this message translates to:
+  /// **'.\n\nInspired by the Kurzgesagt video '**
+  String get aboutDescription4;
+
+  /// Last part of about description
+  ///
+  /// In en, this message translates to:
+  /// **'.'**
+  String get aboutDescription5;
+
+  /// Flutter framework name
+  ///
+  /// In en, this message translates to:
+  /// **'Flutter'**
+  String get flutter;
+
+  /// Company name
+  ///
+  /// In en, this message translates to:
+  /// **'2Dimensions'**
+  String get twoDimensions;
+
+  /// Video title that inspired the app
+  ///
+  /// In en, this message translates to:
+  /// **'The History & Future of Everything'**
+  String get historyAndFutureVideo;
+
+  /// Label for designer credit
+  ///
+  /// In en, this message translates to:
+  /// **'Designed by'**
+  String get designedBy;
+
+  /// Label for technology credit
+  ///
+  /// In en, this message translates to:
+  /// **'Built with'**
+  String get builtWith;
+
+  /// Section title for universe events
+  ///
+  /// In en, this message translates to:
+  /// **'Universe'**
+  String get universe;
+
+  /// Section title for earth events
+  ///
+  /// In en, this message translates to:
+  /// **'Earth'**
+  String get earth;
+
+  /// Section title for life events
+  ///
+  /// In en, this message translates to:
+  /// **'Life'**
+  String get life;
+
+  /// Section title for humanity events
+  ///
+  /// In en, this message translates to:
+  /// **'Humanity'**
+  String get humanity;
+
+  /// Button text to show all items
+  ///
+  /// In en, this message translates to:
+  /// **'Show All'**
+  String get showAll;
+
+  /// Button text to collapse section
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get collapse;
+
+  /// Button text to expand section
+  ///
+  /// In en, this message translates to:
+  /// **'Expand'**
+  String get expand;
+
+  /// Message when search returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get noResults;
+
+  /// Placeholder text in search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search for events...'**
+  String get searchHint;
+
+  /// Close button text
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Back button text
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// Read more button text
+  ///
+  /// In en, this message translates to:
+  /// **'Read More'**
+  String get readMore;
+
+  /// Error message when article fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load article'**
+  String get articleError;
 }
 
 class _AppLocalizationsDelegate

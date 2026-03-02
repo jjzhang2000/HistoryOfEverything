@@ -72,4 +72,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownAgo => 'Unknown Ago';
+
+  @override
+  String get aboutPageTitle => 'The History of\nEverything';
+
+  @override
+  String get version => 'v1.0';
+
+  @override
+  String get aboutDescription1 => 'The History of Everything is built with ';
+
+  @override
+  String get aboutDescription2 => ' by ';
+
+  @override
+  String get aboutDescription3 => '. The graphics and animations were created using tools by ';
+
+  @override
+  String get aboutDescription4 => '.\n\nInspired by the Kurzgesagt video ';
+
+  @override
+  String get aboutDescription5 => '.';
+
+  @override
+  String get flutter => 'Flutter';
+
+  @override
+  String get twoDimensions => '2Dimensions';
+
+  @override
+  String get historyAndFutureVideo => 'The History & Future of Everything';
+
+  @override
+  String get designedBy => 'Designed by';
+
+  @override
+  String get builtWith => 'Built with';
+
+  @override
+  String get universe => 'Universe';
+
+  @override
+  String get earth => 'Earth';
+
+  @override
+  String get life => 'Life';
+
+  @override
+  String get humanity => 'Humanity';
+
+  @override
+  String get showAll => 'Show All';
+
+  @override
+  String get collapse => 'Collapse';
+
+  @override
+  String get expand => 'Expand';
+
+  @override
+  String get noResults => 'No results found';
+
+  @override
+  String get searchHint => 'Search for events...';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get readMore => 'Read More';
+
+  @override
+  String get articleError => 'Failed to load article';
 }
