@@ -686,27 +686,37 @@ dependencies:
 - 启用更多 lint 规则
 - 移除 `// ignore` 注释并修复问题
 
-### 7. 平台适配
+### 7. ~~平台适配~~ 已解决 (✅ 已优化)
 
-**发现问题**:
+**问题描述**:
 `main_menu.dart` 中使用了 `Platform.isAndroid` 判断，Web 平台不支持。
 
+**解决方案**:
+在 `main_menu.dart` 中添加了 `kIsWeb` 检查，避免 Web 平台使用 `Platform.isAndroid` 导致异常：
+
 ```dart
-import "dart:io";
-// ...
-Platform.isAndroid  // Web 平台会抛出异常
+import "package:flutter/foundation.dart" show kIsWeb;
+import "dart:io" show Platform;
+
+// 分享链接逻辑
+onPressed: () {
+  String url;
+  if (kIsWeb) {
+    url = "https://play.google.com/store/apps/details?id=com.twodimensions.timeline";
+  } else if (Platform.isAndroid) {
+    url = "https://play.google.com/store/apps/details?id=com.twodimensions.timeline";
+  } else {
+    url = "itms://itunes.apple.com/us/app/apple-store/id1441257460?mt=8";
+  }
+  Share.share("Check out The History of Everything! $url");
+},
 ```
 
-**建议**:
-```dart
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
-
-bool get isAndroid {
-  if (kIsWeb) return false;
-  return Platform.isAndroid;
-}
-```
+**优势**:
+- Web 平台安全运行，不会因 `Platform` 类不可用而崩溃
+- Android 设备获取 Play Store 链接
+- iOS 设备获取 App Store 链接
+- Web 平台默认使用 Play Store 链接
 
 ---
 
