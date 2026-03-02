@@ -35,7 +35,7 @@
 		"article": "milky_way.txt",
 		"asset": 
 		{
-			"source": "Milky Way/Milky Way.flr",
+			"source": "milky_way/Milky Way.flr",
 			"width": 1293,
 			"height": 1210,
 			"scale": 0.5,
@@ -522,7 +522,7 @@
 		"article":"darwin.txt",
 		"asset": 
 		{
-			"source": "Darwin 2/Darwin 2.nma",
+			"source": "darwin_v2/Darwin 2.nma",
 			"width": 1850,
 			"height": 2100,
 			"scale": 0.22,
@@ -536,7 +536,7 @@
 		"article":"nelson_mandela.txt",
 		"asset": 
 		{
-			"source": "Nelson Mandela_v2/Nelson Mandela_v2.nma",
+			"source": "nelson_mandela_v2/Nelson Mandela_v2.nma",
 			"width": 528,
 			"height": 528,
 			"offset": -40
@@ -612,7 +612,7 @@
 		"id":"mlk",
 		"asset":
 		{
-			"source": "Martin Luther king/Martin Luther king.nma",
+			"source": "martin_luther_king/Martin Luther king.nma",
 			"width": 528,
 			"height": 528,
 			"offset": -140
