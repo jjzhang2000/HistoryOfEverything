@@ -584,10 +584,37 @@ No issues found! (ran in 2.9s)
    - 支持状态组合和依赖注入
    - 保持与现有代码的向后兼容
 
-2. **性能优化**
-   - 实现资源懒加载
-   - 添加内存缓存策略
-   - 优化渲染性能
+2. **~~性能优化~~ 已完成** (✅ 已优化)
+
+**问题描述**:
+资源在启动时全部加载，导致内存占用高和启动延迟。
+
+**解决方案**:
+实现资源懒加载和 LRU 缓存策略：
+
+1. **创建资源缓存管理器** (`app/lib/timeline/resource_cache.dart`):
+   - `ResourceCache` 类 - LRU 缓存实现
+   - 最大内存限制 (默认 50MB)
+   - 自动淘汰最少使用的资源
+   - 缓存命中率统计
+
+2. **ResourceLoader 工具类**:
+   - `loadImage()` - 图片缓存加载
+   - `loadRive()` - Rive 动画缓存加载
+   - `preloadCriticalAssets()` - 关键资源预加载
+
+3. **懒加载支持**:
+   - `TimelineEntry` 添加 `assetFilename`, `assetMap`, `isAssetLoadScheduled` 字段
+   - `_scheduleAssetLoad()` - 异步调度资源加载
+   - `_loadAssetAsync()` - 异步加载资源
+   - `preloadVisibleAssets()` - 预加载可见资源
+
+4. **优势**:
+   - 减少启动时间
+   - 降低内存占用
+   - 按需加载资源
+   - 避免重复加载
+   - 自动内存管理
 
 3. **国际化支持**
    - 提取所有字符串资源

@@ -134,6 +134,15 @@ class TimelineEntry {
   bool isFavoriteOccluded = false;
 
   TimelineAsset? asset;
+  
+  /// Lazy loading support - stores filename for deferred loading
+  String? assetFilename;
+  
+  /// Lazy loading support - stores asset map for deferred loading
+  Map? assetMap;
+  
+  /// Flag to track if asset load has been scheduled
+  bool isAssetLoadScheduled = false;
 
   bool get isVisible {
     return opacity > 0.0;

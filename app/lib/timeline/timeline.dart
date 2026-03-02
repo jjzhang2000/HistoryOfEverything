@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:rive/rive.dart';
+import 'resource_cache.dart';
 import 'timeline_color_manager.dart';
 import 'timeline_constants.dart';
 import 'timeline_viewport.dart';
@@ -288,97 +289,19 @@ class Timeline {
           timelineEntry.articleFilename = map["article"] as String;
         }
 
-        // Load asset
+        // Load asset with caching support
         if (map.containsKey("asset")) {
-          TimelineAsset asset;
           Map assetMap = map["asset"] as Map;
           String source = assetMap["source"];
-          String filename = "assets/$source";
+          String assetFilename = "assets/$source";
           String? extension = getExtension(source);
-
-          if (extension == "riv") {
-            // Load Rive animation file
-            TimelineRive riveAsset = TimelineRive();
-            asset = riveAsset;
-
-            ByteData data = await rootBundle.load(filename);
-            final riveFile = RiveFile.import(data);
-            final artboard = riveFile.mainArtboard;
-            riveAsset.artboard = artboard;
-
-            if (artboard.animations.isNotEmpty) {
-              riveAsset.controller = SimpleAnimation(artboard.animations.first.name);
-              artboard.addController(riveAsset.controller!);
-            }
-          } else if (extension == "flr" || extension == "nma") {
-            // Flare/Nima migration: try to load PNG fallback
-            // First try the asset folder (e.g., Dinosaurs/Dinosaurs.png)
-            // Then try root assets folder (e.g., Sun.png)
-            TimelineImage imageAsset = TimelineImage();
-            asset = imageAsset;
-            
-            bool loaded = false;
-            
-            // Get the base name without extension
-            String baseName = source.substring(0, source.lastIndexOf('.'));
-            String fileBaseName = baseName.contains('/') ? baseName.substring(baseName.lastIndexOf('/') + 1) : baseName;
-            
-            // Try loading from the same directory first
-            List<String> pngPaths = [
-              "assets/$baseName.png",  // e.g., assets/Dinosaurs/Dinosaurs.png
-              "assets/$fileBaseName.png",  // e.g., assets/Dinosaurs.png
-            ];
-            
-            for (String pngPath in pngPaths) {
-              try {
-                ByteData data = await rootBundle.load(pngPath);
-                Uint8List list = Uint8List.view(data.buffer);
-                ui.Codec codec = await ui.instantiateImageCodec(list);
-                ui.FrameInfo frame = await codec.getNextFrame();
-                imageAsset.image = frame.image;
-                loaded = true;
-                debugPrint('Loaded PNG fallback for $source: $pngPath');
-                break;
-              } catch (e) {
-                // Try next path
-              }
-            }
-            
-            if (!loaded) {
-              debugPrint('Warning: No PNG fallback found for $source, using placeholder');
-              // Create a placeholder image (1x1 transparent pixel)
-              ui.PictureRecorder recorder = ui.PictureRecorder();
-              ui.Canvas canvas = ui.Canvas(recorder);
-              ui.Paint paint = ui.Paint()..color = const Color(0x00000000);
-              canvas.drawRect(const Rect.fromLTWH(0, 0, 1, 1), paint);
-              ui.Picture picture = recorder.endRecording();
-              imageAsset.image = await picture.toImage(1, 1);
-            }
-          } else {
-            TimelineImage imageAsset = TimelineImage();
-            asset = imageAsset;
-
-            ByteData data = await rootBundle.load(filename);
-            Uint8List list = Uint8List.view(data.buffer);
-            ui.Codec codec = await ui.instantiateImageCodec(list);
-            ui.FrameInfo frame = await codec.getNextFrame();
-            imageAsset.image = frame.image;
-          }
-
-          double scale = 1.0;
-          if (assetMap.containsKey("scale")) {
-            dynamic s = assetMap["scale"];
-            scale = s is int ? s.toDouble() : s;
-          }
-
-          dynamic width = assetMap["width"];
-          asset.width = (width is int ? width.toDouble() : width) * scale;
-
-          dynamic height = assetMap["height"];
-          asset.height = (height is int ? height.toDouble() : height) * scale;
-          asset.entry = timelineEntry;
-          asset.filename = filename;
-          timelineEntry.asset = asset;
+          
+          // Schedule asset loading asynchronously (lazy loading)
+          timelineEntry.assetFilename = assetFilename;
+          timelineEntry.assetMap = assetMap;
+          
+          // Mark asset as needing loading
+          _scheduleAssetLoad(timelineEntry, extension);
         }
         allEntries.add(timelineEntry);
       }
@@ -439,6 +362,125 @@ class Timeline {
   /// Helper function for [MenuVignette].
   TimelineEntry? getById(String id) {
     return _entriesById[id];
+  }
+
+  /// Schedule asset loading for an entry (lazy loading with caching)
+  void _scheduleAssetLoad(TimelineEntry entry, String? extension) {
+    if (entry.isAssetLoadScheduled || entry.assetFilename == null) return;
+    
+    entry.isAssetLoadScheduled = true;
+    
+    // Load asset asynchronously using the resource cache
+    _loadAssetAsync(entry, extension);
+  }
+
+  /// Load asset asynchronously with caching
+  Future<void> _loadAssetAsync(TimelineEntry entry, String? extension) async {
+    if (entry.assetFilename == null || entry.assetMap == null) return;
+    
+    try {
+      TimelineAsset? asset;
+      String filename = entry.assetFilename!;
+      Map assetMap = entry.assetMap!;
+      
+      if (extension == "riv") {
+        // Load Rive animation with caching
+        final riveAsset = await ResourceLoader.loadRive(filename);
+        if (riveAsset != null) {
+          asset = riveAsset;
+        }
+      } else if (extension == "flr" || extension == "nma") {
+        // Flare/Nima migration: try to load PNG fallback with caching
+        String source = assetMap["source"];
+        String baseName = source.substring(0, source.lastIndexOf('.'));
+        String fileBaseName = baseName.contains('/') ? baseName.substring(baseName.lastIndexOf('/') + 1) : baseName;
+        
+        List<String> pngPaths = [
+          "assets/$baseName.png",
+          "assets/$fileBaseName.png",
+        ];
+        
+        ui.Image? image;
+        for (String pngPath in pngPaths) {
+          image = await ResourceLoader.loadImage(pngPath);
+          if (image != null) {
+            debugPrint('Loaded PNG fallback for $source: $pngPath');
+            break;
+          }
+        }
+        
+        if (image != null) {
+          TimelineImage imageAsset = TimelineImage();
+          imageAsset.image = image;
+          asset = imageAsset;
+        } else {
+          // Create placeholder
+          debugPrint('Warning: No PNG fallback found for $source, using placeholder');
+          ui.PictureRecorder recorder = ui.PictureRecorder();
+          ui.Canvas canvas = ui.Canvas(recorder);
+          ui.Paint paint = ui.Paint()..color = const Color(0x00000000);
+          canvas.drawRect(const Rect.fromLTWH(0, 0, 1, 1), paint);
+          ui.Picture picture = recorder.endRecording();
+          final placeholderImage = await picture.toImage(1, 1);
+          
+          TimelineImage imageAsset = TimelineImage();
+          imageAsset.image = placeholderImage;
+          asset = imageAsset;
+        }
+      } else {
+        // Load regular image with caching
+        final image = await ResourceLoader.loadImage(filename);
+        if (image != null) {
+          TimelineImage imageAsset = TimelineImage();
+          imageAsset.image = image;
+          asset = imageAsset;
+        }
+      }
+      
+      if (asset != null) {
+        // Apply scale and dimensions
+        double scale = 1.0;
+        if (assetMap.containsKey("scale")) {
+          dynamic s = assetMap["scale"];
+          scale = s is int ? s.toDouble() : s;
+        }
+        
+        dynamic width = assetMap["width"];
+        asset.width = (width is int ? width.toDouble() : width) * scale;
+        
+        dynamic height = assetMap["height"];
+        asset.height = (height is int ? height.toDouble() : height) * scale;
+        asset.entry = entry;
+        asset.filename = filename;
+        
+        entry.asset = asset;
+        
+        // Trigger repaint
+        onNeedPaint?.call();
+      }
+    } catch (e) {
+      debugPrint('Error loading asset for ${entry.label}: $e');
+    }
+  }
+  
+  /// Preload assets for visible/nearby entries
+  void preloadVisibleAssets() {
+    for (final entry in _entries) {
+      if (entry.asset == null && entry.assetFilename != null && !entry.isAssetLoadScheduled) {
+        final extension = getExtension(entry.assetFilename!);
+        _scheduleAssetLoad(entry, extension);
+      }
+      
+      // Also check children
+      if (entry.children != null) {
+        for (final child in entry.children!) {
+          if (child.asset == null && child.assetFilename != null && !child.isAssetLoadScheduled) {
+            final extension = getExtension(child.assetFilename!);
+            _scheduleAssetLoad(child, extension);
+          }
+        }
+      }
+    }
   }
 
   /// Make sure while scrolling we're within the correct timeline bounds.
