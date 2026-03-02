@@ -1,235 +1,235 @@
-# Contributing to History of Everything
+# 贡献指南
 
-Thank you for your interest in contributing to the History of Everything project! This document provides guidelines and instructions for contributing.
+感谢您对 History of Everything 项目的关注！本文档提供了贡献的指南和说明。
 
-## Table of Contents
+## 目录
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Project Structure](#project-structure)
-- [Coding Standards](#coding-standards)
-- [Commit Guidelines](#commit-guidelines)
-- [Pull Request Process](#pull-request-process)
-- [Reporting Issues](#reporting-issues)
+- [行为准则](#行为准则)
+- [快速开始](#快速开始)
+- [开发环境设置](#开发环境设置)
+- [项目结构](#项目结构)
+- [编码规范](#编码规范)
+- [提交规范](#提交规范)
+- [Pull Request 流程](#pull-request-流程)
+- [问题反馈](#问题反馈)
 
-## Code of Conduct
+## 行为准则
 
-By participating in this project, you agree to maintain a respectful and inclusive environment for all contributors.
+参与本项目即表示您同意为所有贡献者维护一个尊重和包容的环境。
 
-## Getting Started
+## 快速开始
 
-1. Fork the repository
-2. Clone your fork locally:
+1. Fork 本仓库
+2. 克隆您的 Fork 到本地：
    ```bash
    git clone https://github.com/YOUR_USERNAME/HistoryOfEverything.git
    cd HistoryOfEverything
    ```
-3. Add the upstream repository:
+3. 添加上游仓库：
    ```bash
    git remote add upstream https://github.com/jjzhang2000/HistoryOfEverything.git
    ```
 
-## Development Setup
+## 开发环境设置
 
-### Prerequisites
+### 前提条件
 
 - Flutter SDK (>=3.0.0 <4.0.0)
-- Dart SDK (comes with Flutter)
-- Android Studio / VS Code with Flutter extension
-- Xcode (for iOS development, macOS only)
-- Android SDK (for Android development)
+- Dart SDK（随 Flutter 一起安装）
+- Android Studio / 带 Flutter 扩展的 VS Code
+- Xcode（用于 iOS 开发，仅 macOS）
+- Android SDK（用于 Android 开发）
 
-### Installation
+### 安装步骤
 
-1. Navigate to the app directory:
+1. 进入应用目录：
    ```bash
    cd app
    ```
 
-2. Install dependencies:
+2. 安装依赖：
    ```bash
    flutter pub get
    ```
 
-3. Run the app:
+3. 运行应用：
    ```bash
    flutter run
    ```
 
-### Running Tests
+### 运行测试
 
 ```bash
 flutter test
 ```
 
-### Code Analysis
+### 代码分析
 
 ```bash
 flutter analyze
 ```
 
-## Project Structure
+## 项目结构
 
 ```
 app/lib/
-├── main.dart                    # Application entry point
-├── bloc_provider.dart           # State management (InheritedWidget)
-├── colors.dart                  # Color constants
-├── search_manager.dart          # Search functionality
+├── main.dart                    # 应用入口
+├── bloc_provider.dart           # 状态管理核心（InheritedWidget）
+├── colors.dart                  # 颜色常量定义
+├── search_manager.dart          # 搜索管理器
 │
-├── animation/                   # Animation components
-├── article/                     # Article detail pages
-├── blocs/                       # BLoC state management
-├── main_menu/                   # Main menu components
-├── providers/                   # Riverpod providers
-├── l10n/                        # Localization
-└── timeline/                    # Timeline core module
-    ├── timeline.dart            # Core logic
-    ├── timeline_constants.dart  # Layout constants
-    ├── timeline_viewport.dart   # Viewport management
-    └── timeline_color_manager.dart  # Color management
+├── animation/                   # 动画模块
+├── article/                     # 文章详情模块
+├── blocs/                       # BLoC 状态管理
+├── main_menu/                   # 主菜单模块
+├── providers/                   # Riverpod 状态管理
+├── l10n/                        # 国际化
+└── timeline/                    # 时间线核心模块
+    ├── timeline.dart            # 核心逻辑
+    ├── timeline_constants.dart  # 布局常量
+    ├── timeline_viewport.dart   # 视口管理
+    └── timeline_color_manager.dart  # 颜色管理
 ```
 
-## Coding Standards
+## 编码规范
 
-### Dart Style Guide
+### Dart 风格指南
 
-- Follow the [Effective Dart](https://dart.dev/guides/language/effective-dart) guidelines
-- Use `dart format` to format your code
-- Maximum line length: 80 characters
+- 遵循 [Effective Dart](https://dart.dev/guides/language/effective-dart) 指南
+- 使用 `dart format` 格式化代码
+- 最大行长度：80 字符
 
-### Naming Conventions
+### 命名约定
 
-- **Files**: `snake_case.dart`
-- **Classes**: `PascalCase`
-- **Variables/Functions**: `camelCase`
-- **Constants**: `camelCase` (prefer `const` for compile-time constants)
+- **文件**：`snake_case.dart`
+- **类**：`PascalCase`
+- **变量/函数**：`camelCase`
+- **常量**：`camelCase`（编译时常量优先使用 `const`）
 
-### Documentation
+### 文档注释
 
-- Document all public APIs using dartdoc comments (`///`)
-- Keep comments in English
-- Avoid inline comments that explain what the code does; explain why instead
+- 使用 dartdoc 注释（`///`）记录所有公共 API
+- 注释保持使用英语（代码层面）
+- 避免解释代码做什么的行内注释；应该解释为什么
 
-Example:
+示例：
 ```dart
-/// Calculates the interpolated color at the given position.
+/// 计算给定位置处的插值颜色。
 ///
-/// Returns null if there are no colors to interpolate.
+/// 如果没有可插值的颜色，返回 null。
 Color? interpolateColor(double position) {
-  // Implementation...
+  // 实现...
 }
 ```
 
-### Error Handling
+### 错误处理
 
-- Use proper error handling with try-catch for async operations
-- Provide user-friendly error messages
-- Log errors using `debugPrint` for debugging
+- 异步操作使用 try-catch 进行适当的错误处理
+- 提供用户友好的错误消息
+- 使用 `debugPrint` 记录错误以便调试
 
-### Null Safety
+### 空安全
 
-- Never use `!` (force unwrap) unless absolutely necessary
-- Use `?.` for safe access
-- Provide sensible default values with `??`
+- 除非绝对必要，不要使用 `!`（强制解包）
+- 使用 `?.` 进行安全访问
+- 使用 `??` 提供合理的默认值
 
-## Commit Guidelines
+## 提交规范
 
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+我们遵循 [Conventional Commits](https://www.conventionalcommits.org/) 规范：
 
-### Format
-
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
-```
-
-### Types
-
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Adding or modifying tests
-- `chore`: Changes to build process or auxiliary tools
-
-### Examples
+### 格式
 
 ```
-feat(timeline): add zoom animation for timeline navigation
+<类型>(<范围>): <描述>
 
-fix(search): resolve crash when searching with empty query
+[可选的正文]
 
-docs(readme): update installation instructions
+[可选的页脚]
 ```
 
-## Pull Request Process
+### 类型
 
-1. Create a feature branch from `Upgrade`:
+- `feat`：新功能
+- `fix`：Bug 修复
+- `docs`：文档变更
+- `style`：代码样式变更（格式化等）
+- `refactor`：代码重构
+- `perf`：性能改进
+- `test`：添加或修改测试
+- `chore`：构建过程或辅助工具的变更
+
+### 示例
+
+```
+feat(timeline): 添加时间线导航的缩放动画
+
+fix(search): 修复空查询搜索时的崩溃问题
+
+docs(readme): 更新安装说明
+```
+
+## Pull Request 流程
+
+1. 从 `Upgrade` 分支创建功能分支：
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
-2. Make your changes and commit them following the commit guidelines.
+2. 进行更改并按照提交规范提交。
 
-3. Push your branch to your fork:
+3. 推送分支到您的 Fork：
    ```bash
    git push origin feature/your-feature-name
    ```
 
-4. Create a Pull Request on GitHub.
+4. 在 GitHub 上创建 Pull Request。
 
-5. Ensure all checks pass:
-   - Code analysis (`flutter analyze`)
-   - Tests (`flutter test`)
-   - Build verification
+5. 确保所有检查通过：
+   - 代码分析（`flutter analyze`）
+   - 测试（`flutter test`）
+   - 构建验证
 
-6. Request review from maintainers.
+6. 请求维护者审核。
 
-7. Address review feedback.
+7. 处理审核反馈。
 
-### PR Checklist
+### PR 检查清单
 
-- [ ] Code follows the project's coding standards
-- [ ] All tests pass
-- [ ] New code is properly documented
-- [ ] Commit messages follow the guidelines
-- [ ] PR description clearly describes the changes
+- [ ] 代码遵循项目的编码规范
+- [ ] 所有测试通过
+- [ ] 新代码有适当的文档
+- [ ] 提交消息遵循规范
+- [ ] PR 描述清楚地描述了更改
 
-## Reporting Issues
+## 问题反馈
 
-### Bug Reports
+### Bug 报告
 
-When reporting bugs, please include:
+报告 Bug 时，请包含：
 
-1. **Description**: A clear description of the bug
-2. **Steps to Reproduce**: Detailed steps to reproduce the issue
-3. **Expected Behavior**: What you expected to happen
-4. **Actual Behavior**: What actually happened
-5. **Environment**: 
-   - Flutter version (`flutter --version`)
-   - Device/Platform
-   - App version
-6. **Screenshots**: If applicable
-7. **Logs**: Any relevant error logs
+1. **描述**：清晰描述 Bug
+2. **复现步骤**：详细的复现步骤
+3. **期望行为**：您期望发生什么
+4. **实际行为**：实际发生了什么
+5. **环境信息**：
+   - Flutter 版本（`flutter --version`）
+   - 设备/平台
+   - 应用版本
+6. **截图**：如适用
+7. **日志**：任何相关的错误日志
 
-### Feature Requests
+### 功能请求
 
-For feature requests, please include:
+对于功能请求，请包含：
 
-1. **Description**: A clear description of the feature
-2. **Use Case**: Why this feature would be useful
-3. **Proposed Solution**: If you have ideas for implementation
-4. **Alternatives**: Any alternative solutions considered
+1. **描述**：清晰描述功能
+2. **使用场景**：为什么这个功能有用
+3. **建议方案**：如果您有实现想法
+4. **替代方案**：考虑过的任何替代方案
 
-## Questions?
+## 有问题？
 
-If you have questions about contributing, feel free to open an issue with the `question` label.
+如果您对贡献有任何疑问，请随时打开带有 `question` 标签的 Issue。
 
-Thank you for contributing to History of Everything!
+感谢您对 History of Everything 的贡献！
