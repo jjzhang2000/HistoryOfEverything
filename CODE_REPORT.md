@@ -421,52 +421,76 @@ TimelineWidget
                 └── AnimatedFavoriteButton (收藏按钮)
 ```
 
-### 8. 测试架构
+### 8. 测试类调用关系
 
 ```
-test/
-├── search_manager_test.dart          # 搜索功能测试
-│   └── 测试内容: 单例模式、前缀匹配、多词搜索、建议功能
-│
-├── widget_test.dart                  # 基础 Widget 测试
-│
-├── article/
-│   └── article_widget_test.dart      # 文章页面测试
-│
-├── blocs/
-│   └── favorites_bloc_test.dart      # 收藏功能测试
-│   └── 测试内容: 初始化、添加/删除收藏、持久化、排序
-│
-├── models/
-│   └── timeline_entry_test.dart      # 时间线条目模型测试
-│
-├── providers/
-│   └── app_providers_test.dart       # Riverpod 状态管理测试
-│   └── 测试内容: AppInitData、FavoritesListNotifier、各 Provider
-│
-└── timeline/
-    ├── resource_cache_test.dart      # LRU 缓存测试
-    │   └── 测试内容: 缓存操作、LRU淘汰、命中率统计
+SearchManagerTest
     │
-    ├── timeline_color_manager_test.dart  # 颜色管理测试
+    ├── 测试目标: SearchManager (单例)
     │
-    ├── timeline_test.dart            # 时间线核心测试
-    │   └── 测试内容: 视口设置、缩放计算、回调函数
+    ├── 测试方法
+    │     ├── test singleton pattern
+    │     ├── test init/initWithAsync
+    │     └── test reset
     │
-    └── timeline_viewport_test.dart   # 视口逻辑测试
-        └── 测试内容: 视口边界、平台行为、滚动模拟
+    └── 搜索功能测试
+          ├── performSearch() → 验证前缀匹配
+          ├── performMultiWordSearch() → 验证多词搜索
+          └── getSuggestions() → 验证建议限制
+
+FavoritesBlocTest
+    │
+    ├── 测试目标: FavoritesBloc
+    │
+    ├── 依赖: SharedPreferences (Mock)
+    │
+    └── 测试方法
+          ├── init() → 验证从 SharedPreferences 加载
+          ├── addFavorite() → 验证添加、去重、排序
+          ├── removeFavorite() → 验证删除
+          └── persistence → 验证持久化存储
+
+TimelineViewportTest
+    │
+    ├── 测试目标: TimelineViewport
+    │
+    └── 测试方法
+          ├── setViewport() → 验证视口边界设置
+          ├── clampScroll() → 验证滚动限制
+          ├── computeScaleFor() → 验证缩放计算
+          └── animateViewport() → 验证视口动画
+
+ResourceCacheTest
+    │
+    ├── 测试目标: ResourceCache
+    │
+    └── 测试方法
+          ├── put()/get() → 验证基本缓存操作
+          ├── LRU eviction → 验证淘汰策略
+          ├── getOrLoad() → 验证并发加载
+          └── clear()/clearPattern() → 验证清理功能
+
+TimelineTest
+    │
+    ├── 测试目标: Timeline
+    │
+    └── 测试方法
+          ├── setViewport() → 验证视口设置
+          ├── computeScale() → 验证缩放计算
+          ├── screenPaddingInTime() → 验证时间边距
+          └── callbacks → 验证 onNeedPaint/onEraChanged
+
+AppProvidersTest
+    │
+    ├── 测试目标: Riverpod Providers
+    │
+    ├── 依赖: ProviderContainer
+    │
+    └── 测试组件
+          ├── AppInitData → 状态数据类测试
+          ├── FavoritesListNotifier → 收藏列表通知器测试
+          └── Providers → platformProvider, timelineProvider 等
 ```
-
-**测试覆盖的关键功能**:
-
-| 模块 | 测试重点 |
-|------|---------|
-| SearchManager | 前缀索引、大小写不敏感、多词搜索、建议限制 |
-| FavoritesBloc | SharedPreferences持久化、排序、去重 |
-| TimelineViewport | 视口边界、平台兼容、滚动限制 |
-| ResourceCache | LRU淘汰策略、并发加载、缓存统计 |
-| Timeline | 视口动画、缩放计算、回调触发 |
-| AppProviders | 状态初始化、Provider创建、状态更新 |
 
 ---
 
