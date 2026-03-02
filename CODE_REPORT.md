@@ -309,31 +309,29 @@ if (asset is TimelineRive && asset.artboard != null) {
 }
 ```
 
-### 2. 搜索索引性能问题 (中优先级)
+### 2. ~~搜索索引性能问题~~ 已解决 (✅ 已优化)
 
 **问题描述**:
 搜索索引构建使用 O(n²) 算法，对于长标签会有性能问题。
 
-**代码位置**: `lib/search_manager.dart`
+**解决方案**:
+改用基于单词的前缀索引策略：
+- 将标签分词（按空格、连字符、下划线等分隔符）
+- 为每个单词的所有前缀建立索引
+- 时间复杂度从 O(n*l²) 降低到 O(n*w*p)
+  - n: 条目数量
+  - w: 每个条目的平均单词数
+  - p: 每个单词的前缀数
 
-```dart
-void _fill(List<TimelineEntry> entries) {
-  for (TimelineEntry e in entries) {
-    String label = e.label;
-    int len = label.length;
-    for (int i = 0; i < len; i++) {
-      for (int j = i + 1; j <= len; j++) {
-        String substring = label.substring(i, j).toLowerCase();
-        // O(n²) 复杂度
-      }
-    }
-  }
-}
-```
+**新增功能**:
+- `performSearch()`: 前缀匹配搜索 (O(1) 查询)
+- `performMultiWordSearch()`: 多词 AND 搜索
+- `getSuggestions()`: 自动补全建议
+- `initAsync()`: 异步初始化，避免阻塞 UI
+- `isInitialized`: 初始化状态检查
+- `indexedWordCount/indexedPrefixCount`: 索引统计信息
 
-**影响**:
-- 应用启动时可能卡顿
-- 内存占用较高（存储所有子字符串映射）
+**代码位置**: `app/lib/search_manager.dart`
 
 ### 3. 错误处理不完善 (中优先级)
 
