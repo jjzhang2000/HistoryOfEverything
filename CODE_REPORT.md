@@ -435,26 +435,29 @@ TimelineWidget
 - 使用 Rive 状态机重新实现交互动画
 - 为特定条目（牛顿、阿梅利亚等）创建新的 Rive 动画
 
-### 2. 测试覆盖率提升 (中优先级)
+### 2. 测试覆盖率 ✅ 已完成
 
 **现状**:
-测试用例较少，需要增加测试覆盖。
+已建立完整的测试体系，覆盖核心功能模块。
 
-**建议添加**:
+**已有测试**:
 ```
 test/
-├── unit/
-│   ├── search_manager_test.dart      # 搜索功能测试
-│   ├── timeline_viewport_test.dart   # 视口逻辑测试
-│   ├── resource_cache_test.dart      # 缓存测试
-│   └── favorites_bloc_test.dart      # 收藏功能测试
-│
-├── widget/
-│   ├── timeline_widget_test.dart     # 时间线渲染测试
+├── search_manager_test.dart          # 搜索功能测试（前缀匹配、多词搜索）
+├── widget_test.dart                  # 基础 Widget 测试
+├── article/
 │   └── article_widget_test.dart      # 文章页面测试
-│
-└── integration/
-    └── app_test.dart                 # 端到端测试
+├── blocs/
+│   └── favorites_bloc_test.dart      # 收藏功能测试（添加/删除/持久化）
+├── models/
+│   └── timeline_entry_test.dart      # 时间线条目模型测试
+├── providers/
+│   └── app_providers_test.dart       # Riverpod 状态管理测试
+└── timeline/
+    ├── resource_cache_test.dart      # LRU 缓存测试
+    ├── timeline_color_manager_test.dart  # 颜色管理测试
+    ├── timeline_test.dart            # 时间线核心测试
+    └── timeline_viewport_test.dart   # 视口逻辑测试
 ```
 
 ### 3. 资源文件规范化 (低优先级)
@@ -492,10 +495,10 @@ test/
 - ✅ 项目文档完善（CONTRIBUTING.md, CHANGELOG.md）
 - ✅ CI/CD 配置（GitHub Actions）
 - ✅ 国际化支持（英语、中文）
+- ✅ 测试覆盖率提升（11个测试文件）
 
 **待改进项**:
 - 🔴 动画控制器重构（移除废弃代码）
-- 🟡 测试覆盖率提升
 - 🟢 资源文件规范化
 - 🟢 性能监控集成
 
