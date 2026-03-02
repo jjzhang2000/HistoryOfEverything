@@ -36,7 +36,7 @@ class FavoritesBloc {
     }
     /// Sort by starting time, so the favorites' list is always displayed in ascending order.
     _favorites.sort((TimelineEntry a, TimelineEntry b) {
-      return a.start!.compareTo(b.start!);
+      return (a.start ?? 0).compareTo(b.start ?? 0);
     });
   }
 
@@ -49,7 +49,7 @@ class FavoritesBloc {
     if (!_favorites.contains(e)) {
       _favorites.add(e);
       _favorites.sort((TimelineEntry a, TimelineEntry b) {
-        return a.start!.compareTo(b.start!);
+        return (a.start ?? 0).compareTo(b.start ?? 0);
       });
       _save();
     }

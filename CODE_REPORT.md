@@ -356,18 +356,33 @@ if (asset is TimelineRive && asset.artboard != null) {
 - `app/lib/bloc_provider.dart`
 - `app/lib/article/article_widget.dart`
 
-### 4. 空安全问题 (低优先级)
+### 4. ~~空安全问题~~ 已解决 (✅ 已优化)
 
 **问题描述**:
 部分代码使用了 `!` 强制解包，可能在运行时抛出空指针异常。
 
-**代码位置**: `lib/timeline/timeline.dart`
+**解决方案**:
 
-```dart
-// 可能的空指针异常
-_timeline!.nextEntry!.label
-_timeline!.prevEntry!.start!
-```
+1. **timeline.dart**:
+   - 使用安全访问 `?.` 替代强制解包 `!`
+   - 添加合理的默认值 (如 `?? 0.0`)
+
+2. **bloc_provider.dart**:
+   - 使用局部变量存储可空值
+   - 提供默认值处理
+
+3. **favorites_bloc.dart**:
+   - 使用 `(a.start ?? 0).compareTo(b.start ?? 0)` 替代强制解包
+
+4. **menu_data.dart**:
+   - 使用局部变量 `entryStart` 存储可空值
+   - 使用 `?? entryStart` 提供默认值
+
+**代码位置**: 
+- `app/lib/timeline/timeline.dart`
+- `app/lib/bloc_provider.dart`
+- `app/lib/blocs/favorites_bloc.dart`
+- `app/lib/main_menu/menu_data.dart`
 
 ### 5. 代码注释语言混杂 (低优先级)
 

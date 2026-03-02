@@ -40,8 +40,9 @@ class MenuItemData {
       padTop += asset.gap;
     }
 
+    final entryStart = entry.start ?? 0.0;
     if (entry.type == TimelineEntryType.Era) {
-      start = entry.start!;
+      start = entryStart;
       end = entry.end;
     } else {
       /// No need to pad here as we are centering on a single item.
@@ -49,24 +50,30 @@ class MenuItemData {
       for (TimelineEntry? prev = entry.previous;
           prev != null;
           prev = prev.previous) {
-        double diff = entry.start! - prev.start!;
-        if (diff > 0.0) {
-          rangeBefore = diff;
-          break;
+        final prevStart = prev.start;
+        if (prevStart != null) {
+          double diff = entryStart - prevStart;
+          if (diff > 0.0) {
+            rangeBefore = diff;
+            break;
+          }
         }
       }
 
       double rangeAfter = double.maxFinite;
       for (TimelineEntry? next = entry.next; next != null; next = next.next) {
-        double diff = next.start! - entry.start!;
-        if (diff > 0.0) {
-          rangeAfter = diff;
-          break;
+        final nextStart = next.start;
+        if (nextStart != null) {
+          double diff = nextStart - entryStart;
+          if (diff > 0.0) {
+            rangeAfter = diff;
+            break;
+          }
         }
       }
       double range = min(rangeBefore, rangeAfter) / 2.0;
-      start = entry.start;
-      end = entry.end! + range;
+      start = entryStart;
+      end = (entry.end ?? entryStart) + range;
     }
   }
 }

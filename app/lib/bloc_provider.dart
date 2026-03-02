@@ -53,9 +53,11 @@ class BlocProvider extends InheritedWidget {
       }
 
       // Initialize timeline viewport
+      final firstEntry = entries.first;
+      final firstStart = firstEntry.start ?? 0.0;
       timeline.setViewport(
-          start: entries.first.start! * 2.0,
-          end: entries.first.start!,
+          start: firstStart * 2.0,
+          end: firstStart,
           animate: true);
       timeline.advance(0.0, false);
 
