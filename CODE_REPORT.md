@@ -333,34 +333,28 @@ if (asset is TimelineRive && asset.artboard != null) {
 
 **代码位置**: `app/lib/search_manager.dart`
 
-### 3. 错误处理不完善 (中优先级)
+### 3. ~~错误处理不完善~~ 已解决 (✅ 已优化)
 
 **问题描述**:
 部分异步操作缺少完善的错误处理。
 
-**示例 1 - `bloc_provider.dart`**:
-```dart
-void _initializeData() {
-  timeline.loadFromBundle("assets/timeline.json").then((entries) {
-    // 成功处理
-  }).catchError((error) {
-    print('Error loading timeline: $error');
-    // 仅打印错误，没有用户友好的错误提示
-  });
-}
-```
+**解决方案**:
 
-**示例 2 - `article_widget.dart`**:
-```dart
-void loadMarkdown(String filename) async {
-  rootBundle.loadString("assets/Articles/$filename").then((String data) {
-    setState(() {
-      _articleMarkdown = data;
-    });
-  });
-  // 没有 catchError 处理
-}
-```
+1. **BlocProvider 初始化错误处理**:
+   - 添加 `AppInitState` 枚举 (loading/success/error)
+   - 使用 `ValueNotifier` 管理初始化状态和错误消息
+   - 支持重试初始化 (`retryInitialization()`)
+   - 静态访问器: `getInitState()`, `getErrorMessage()`, `retry()`
+
+2. **ArticleWidget 错误处理**:
+   - 添加 `_loadError` 和 `_errorMessage` 状态变量
+   - 使用 try-catch 包装异步加载
+   - 显示用户友好的错误提示 UI
+   - 添加加载状态指示器
+
+**代码位置**: 
+- `app/lib/bloc_provider.dart`
+- `app/lib/article/article_widget.dart`
 
 ### 4. 空安全问题 (低优先级)
 

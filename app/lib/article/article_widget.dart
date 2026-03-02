@@ -35,6 +35,10 @@ class _ArticleWidgetState extends State<ArticleWidget> {
   /// Whether the [FlareActor] favorite button is active or not. 
   /// Triggers a Flare animation upon change.
   bool _isFavorite = false;
+  
+  /// Error state for markdown loading
+  bool _loadError = false;
+  String _errorMessage = "";
 
   /// This parameter helps control the Amelia Earhart and the Newton animations.
   /// Test it out yourself! =)
@@ -102,12 +106,27 @@ class _ArticleWidgetState extends State<ArticleWidget> {
   }
 
   /// Load the markdown file from the assets and set the contents of the page to its value.
-  void loadMarkdown(String filename) async {
-    rootBundle.loadString("assets/Articles/$filename").then((String data) {
-      setState(() {
-        _articleMarkdown = data;
-      });
-    });
+  /// Handles errors gracefully by showing an error message to the user.
+  Future<void> loadMarkdown(String filename) async {
+    try {
+      final data = await rootBundle.loadString("assets/Articles/$filename");
+      if (mounted) {
+        setState(() {
+          _articleMarkdown = data;
+          _loadError = false;
+          _errorMessage = "";
+        });
+      }
+    } catch (error) {
+      debugPrint('Error loading article "$filename": $error');
+      if (mounted) {
+        setState(() {
+          _loadError = true;
+          _errorMessage = 'Failed to load article content';
+          _articleMarkdown = "";
+        });
+      }
+    }
   }
 
   /// This widget is wrapped in a [Scaffold] to have the classic Material Design visual layout structure.
@@ -217,9 +236,56 @@ class _ArticleWidgetState extends State<ArticleWidget> {
                                 margin: const EdgeInsets.only(top: 20, bottom: 20),
                                 height: 1,
                                 color: Colors.black.withValues(alpha: 0.11)),
-                            MarkdownBody(
-                                data: _articleMarkdown,
-                                styleSheet: _markdownStyleSheet!),
+                            // Show error message or markdown content
+                            if (_loadError)
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.red.shade200),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.error_outline, color: Colors.red.shade400),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Unable to load article',
+                                            style: TextStyle(
+                                              color: Colors.red.shade700,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            _errorMessage,
+                                            style: TextStyle(
+                                              color: Colors.red.shade600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else if (_articleMarkdown.isEmpty)
+                              const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                            else
+                              MarkdownBody(
+                                  data: _articleMarkdown,
+                                  styleSheet: _markdownStyleSheet!),
                             const SizedBox(height: 100),
                           ],
                         )))
