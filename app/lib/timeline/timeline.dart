@@ -297,6 +297,7 @@ class Timeline {
           String? extension = getExtension(source);
 
           if (extension == "riv") {
+            // Load Rive animation file
             TimelineRive riveAsset = TimelineRive();
             asset = riveAsset;
 
@@ -308,6 +309,50 @@ class Timeline {
             if (artboard.animations.isNotEmpty) {
               riveAsset.controller = SimpleAnimation(artboard.animations.first.name);
               artboard.addController(riveAsset.controller!);
+            }
+          } else if (extension == "flr" || extension == "nma") {
+            // Flare/Nima migration: try to load PNG fallback
+            // First try the asset folder (e.g., Dinosaurs/Dinosaurs.png)
+            // Then try root assets folder (e.g., Sun.png)
+            TimelineImage imageAsset = TimelineImage();
+            asset = imageAsset;
+            
+            bool loaded = false;
+            
+            // Get the base name without extension
+            String baseName = source.substring(0, source.lastIndexOf('.'));
+            String fileBaseName = baseName.contains('/') ? baseName.substring(baseName.lastIndexOf('/') + 1) : baseName;
+            
+            // Try loading from the same directory first
+            List<String> pngPaths = [
+              "assets/$baseName.png",  // e.g., assets/Dinosaurs/Dinosaurs.png
+              "assets/$fileBaseName.png",  // e.g., assets/Dinosaurs.png
+            ];
+            
+            for (String pngPath in pngPaths) {
+              try {
+                ByteData data = await rootBundle.load(pngPath);
+                Uint8List list = Uint8List.view(data.buffer);
+                ui.Codec codec = await ui.instantiateImageCodec(list);
+                ui.FrameInfo frame = await codec.getNextFrame();
+                imageAsset.image = frame.image;
+                loaded = true;
+                debugPrint('Loaded PNG fallback for $source: $pngPath');
+                break;
+              } catch (e) {
+                // Try next path
+              }
+            }
+            
+            if (!loaded) {
+              debugPrint('Warning: No PNG fallback found for $source, using placeholder');
+              // Create a placeholder image (1x1 transparent pixel)
+              ui.PictureRecorder recorder = ui.PictureRecorder();
+              ui.Canvas canvas = ui.Canvas(recorder);
+              ui.Paint paint = ui.Paint()..color = const Color(0x00000000);
+              canvas.drawRect(const Rect.fromLTWH(0, 0, 1, 1), paint);
+              ui.Picture picture = recorder.endRecording();
+              imageAsset.image = await picture.toImage(1, 1);
             }
           } else {
             TimelineImage imageAsset = TimelineImage();
