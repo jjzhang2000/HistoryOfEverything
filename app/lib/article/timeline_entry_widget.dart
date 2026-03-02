@@ -1,21 +1,8 @@
 import "dart:ui" as ui;
 
-// TODO: Reimplement with Rive - Flare/Nima imports removed
-// import 'package:flare_flutter/flare.dart' as flare;
-// import 'package:flare_dart/actor_image.dart' as flare;
-// import 'package:flare_dart/math/aabb.dart' as flare;
-// import 'package:flare_dart/math/mat2d.dart' as flare;
-// import 'package:flare_dart/math/vec2d.dart' as flare;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-// import 'package:nima/nima.dart' as nima;
-// import 'package:nima/nima/actor_image.dart' as nima;
-// import 'package:nima/nima/math/aabb.dart' as nima;
-// import 'package:nima/nima/math/vec2d.dart' as nima;
-// import 'package:timeline/article/controllers/amelia_controller.dart';
-// import 'package:timeline/article/controllers/flare_interaction_controller.dart';
-// import 'package:timeline/article/controllers/newton_controller.dart';
-// import 'package:timeline/article/controllers/nima_interaction_controller.dart';
+import 'package:rive/rive.dart';
 import 'package:timeline/timeline/timeline_entry.dart';
 
 /// This widget renders a single [TimelineEntry]. It relies on a [LeafRenderObjectWidget] 
@@ -56,76 +43,29 @@ class TimelineEntryWidget extends LeafRenderObjectWidget {
   }
 }
 
-// Stub classes for controllers - TODO: Reimplement with Rive
-class FlareInteractionController {
-  // Stub - will be reimplemented
-}
-
-class NimaInteractionController {
-  // Stub - will be reimplemented
-}
-
-
 /// When extending a [RenderBox] we provide a custom set of instructions for the widget being rendered.
 /// 
 /// In particular this means overriding the [paint()] and [hitTestSelf()] methods to render the loaded
-/// Flare/Nima [FlutterActor] where the widget is being placed.
+/// Rive animations or static images where the widget is being placed.
 class VignetteRenderObject extends RenderBox {
   static const Alignment alignment = Alignment.center;
   static const BoxFit fit = BoxFit.contain;
   
   bool _isActive = false;
-  // ignore: unused_field
   bool _firstUpdate = true;
   bool _isFrameScheduled = false;
   double _lastFrameTime = 0.0;
   Offset? interactOffset;
-  // ignore: unused_field
   Offset? _renderOffset;
 
   TimelineEntry? _timelineEntry;
-  // TODO: Reimplement with Rive
-  // nima.FlutterActor _nimaActor;
-  // flare.FlutterActorArtboard _flareActor;
-  // FlareInteractionController? _flareController;
-  // NimaInteractionController? _nimaController;
 
   /// Called whenever a new [TimelineEntry] is being set.
+  /// Rive animations are already loaded in TimelineRive, so no additional setup needed here.
   updateActor() {
-    // TODO: Reimplement with Rive
-    // if (_timelineEntry == null) {
-    //   /// If [_timelineEntry] is removed, free its resources.
-    //   _nimaActor?.dispose();
-    //   _flareActor?.dispose();
-    //   _nimaActor = null;
-    //   _flareActor = null;
-    // } else {
-    //   TimelineAsset asset = _timelineEntry!.asset;
-    //   if (asset is TimelineNima && asset.actor != null) {
-    //     /// Instance [_nimaActor] through the actor reference in the asset
-    //     /// and set the initial starting value for its animation.
-    //     _nimaActor = asset.actor.makeInstance();
-    //     asset.animation.apply(asset.animation.duration, _nimaActor, 1.0);
-    //     _nimaActor.advance(0.0);
-    //     if (asset.filename == "assets/Newton/Newton_v2.nma") {
-    //       /// Newton uses a custom controller! =)
-    //       _nimaController = NewtonController();
-    //       _nimaController.initialize(_nimaActor);
-    //     }
-    //   } else if (asset is TimelineFlare && asset.actor != null) {
-    //     /// Instance [_flareActor] through the actor reference in the asset
-    //     /// and set the initial starting value for its animation.
-    //     _flareActor = asset.actor.makeInstance();
-    //     _flareActor.initializeGraphics();
-    //     asset.animation.apply(asset.animation.duration, _flareActor, 1.0);
-    //     _flareActor.advance(0.0);
-    //     if (asset.filename == "assets/Amelia_Earhart/Amelia_Earhart.flr") {
-    //       /// Amelia Earhart uses a custom controller too..!
-    //       _flareController = AmeliaController();
-    //       _flareController.initialize(_flareActor);
-    //     }
-    //   }
-    // }
+    // Rive animations are managed by TimelineRive class
+    // The artboard is already initialized in timeline.dart
+    _firstUpdate = true;
   }
 
   /// Uses the [SchedulerBinding] to trigger a new paint for this widget.
@@ -170,7 +110,9 @@ class VignetteRenderObject extends RenderBox {
   bool hitTestSelf(Offset screenOffset) {
     if (_timelineEntry != null) {
       TimelineAsset? asset = _timelineEntry!.asset;
-      if (asset is TimelineNima) {
+      if (asset is TimelineRive) {
+        asset.animationTime = 0.0;
+      } else if (asset is TimelineNima) {
         asset.animationTime = 0.0;
       } else if (asset is TimelineFlare) {
         asset.animationTime = 0.0;
@@ -185,7 +127,7 @@ class VignetteRenderObject extends RenderBox {
   }
 
   /// This overridden method is where we can implement our custom logic, for
-  /// laying out the [FlutterActor], and drawing it to [canvas].
+  /// laying out the animation assets, and drawing it to [canvas].
   @override
   void paint(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
@@ -212,20 +154,28 @@ class VignetteRenderObject extends RenderBox {
             ..isAntiAlias = true
             ..filterQuality = ui.FilterQuality.low
             ..color = Colors.white.withValues(alpha: asset.opacity));
+    } 
+    /// Render Rive animation
+    else if (asset is TimelineRive && asset.artboard != null) {
+      final artboard = asset.artboard!;
+      
+      // Calculate the position for the animation
+      double x = offset.dx + size.width - w;
+      double y = asset.y;
+      
+      // Apply transformation for positioning
+      canvas.translate(x, y);
+      
+      // Draw the Rive artboard directly on canvas
+      // Note: Rive artboards are drawn using their draw method
+      artboard.draw(canvas);
     }
-    // TODO: Reimplement Nima/Flare rendering with Rive
-    // else if (asset is TimelineNima && _nimaActor != null) {
-    //   ...nima rendering code...
-    // } else if (asset is TimelineFlare && _flareActor != null) {
-    //   ...flare rendering code...
-    // }
+    
     canvas.restore();
   }
 
-  /// This callback is used by the [SchedulerBinding] in order to advance the Flare/Nima 
-  /// animations properly, and update the corresponding [FlutterActor]s.
-  /// It is also responsible for advancing any attached components to said Actors,
-  /// such as [_nimaController] or [_flareController].
+  /// This callback is used by the [SchedulerBinding] in order to advance the 
+  /// animations properly, and update the corresponding artboards.
   void beginFrame(Duration timeStamp) {
     _isFrameScheduled = false;
     final double t =
@@ -238,14 +188,16 @@ class VignetteRenderObject extends RenderBox {
     }
 
     /// Calculate the elapsed time to [advance()] the animations.
-    // ignore: unused_local_variable
     double elapsed = t - _lastFrameTime;
     _lastFrameTime = t;
-    // TODO: Reimplement Nima/Flare animation with Rive
-    // if (_timelineEntry != null) {
-    //   TimelineAsset asset = _timelineEntry!.asset;
-    //   ...animation code...
-    // }
+    
+    // Advance Rive animation if it's a Rive asset
+    if (_timelineEntry != null) {
+      TimelineAsset? asset = _timelineEntry!.asset;
+      if (asset is TimelineRive && asset.artboard != null) {
+        asset.artboard!.advance(elapsed);
+      }
+    }
 
     /// Invalidate the current widget visual state and let Flutter paint it again.
     markNeedsPaint();

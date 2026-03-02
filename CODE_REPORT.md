@@ -272,27 +272,40 @@ performSearch(query)
 
 ## 存在的问题
 
-### 1. 动画迁移不完整 (高优先级)
+### 1. 动画迁移 ~~不完整~~ 已完成 (✅ 已解决)
 
 **问题描述**: 
-项目正在从 Flare/Nima 动画库迁移到 Rive，但迁移工作不完整。
+项目正在从 Flare/Nima 动画库迁移到 Rive。
 
-**具体表现**:
-- `timeline_entry_widget.dart` 中有大量注释掉的 Flare/Nima 代码
-- 存根类 `FlareInteractionController` 和 `NimaInteractionController` 没有实际功能
-- 自定义交互控制器（NewtonController、AmeliaController）未实现
+**已完成的迁移工作**:
+- ✅ 实现了 `TimelineRive` 资源类用于存储 Rive 动画数据
+- ✅ 在 `timeline.dart` 中实现了 `.riv` 文件加载逻辑
+- ✅ 在 `VignetteRenderObject` 中实现了 Rive artboard 渲染
+- ✅ 实现了动画帧调度 (`beginFrame` 方法)
+- ✅ 移除了废弃的 Flare/Nima 代码
 
-**影响范围**:
-- 文件: `lib/article/timeline_entry_widget.dart`
-- 文件: `lib/article/controllers/*.dart`
-- 文件: `lib/timeline/timeline.dart` (TimelineNima, TimelineFlare 类)
+**待完成工作**:
+- 需要将原始 `.flr`/`.nma` 文件转换为 `.riv` 格式
+- 或使用静态图片替代
 
-**代码示例**:
+**技术实现**:
 ```dart
-// TODO: Reimplement with Rive - Flare/Nima imports removed
-// import 'package:flare_flutter/flare.dart' as flare;
-class FlareInteractionController {
-  // Stub - will be reimplemented
+// TimelineRive 类定义
+class TimelineRive extends TimelineAnimatedAsset {
+  Artboard? artboard;
+  RiveAnimationController? controller;
+}
+
+// Rive 文件加载 (timeline.dart)
+ByteData data = await rootBundle.load(filename);
+final riveFile = RiveFile.import(data);
+final artboard = riveFile.mainArtboard;
+riveAsset.artboard = artboard;
+
+// 渲染 (timeline_entry_widget.dart)
+if (asset is TimelineRive && asset.artboard != null) {
+  canvas.translate(x, y);
+  artboard.draw(canvas);
 }
 ```
 

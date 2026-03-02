@@ -46,6 +46,14 @@ class SearchManager {
     _pendingEntries = null;
   }
 
+  /// Initialize the search manager with entries. 
+  /// This can be called after construction to set up the search index.
+  void init(List<TimelineEntry> entries) {
+    _pendingEntries = entries;
+    // Build the index immediately
+    _ensureInitialized();
+  }
+
   void _fill(List<TimelineEntry> entries) {
     /// Sanity check.
     _queryMap.clear(); 
