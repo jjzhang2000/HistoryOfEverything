@@ -1,0 +1,103 @@
+{
+  "@@locale": "zh",
+  "appTitle": "万物的历史与未来",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "historyOfEverything": "万物的历史",
+  "@historyOfEverything": {
+    "description": "Main title displayed in the menu"
+  },
+  "yourFavorites": "我的收藏",
+  "@yourFavorites": {
+    "description": "Title for the favorites page"
+  },
+  "noFavoritesYet": "您还没有收藏任何内容。",
+  "@noFavoritesYet": {
+    "description": "Message shown when user has no favorites"
+  },
+  "about": "关于",
+  "@about": {
+    "description": "Title for the about page"
+  },
+  "retry": "重试",
+  "@retry": {
+    "description": "Button text for retrying an action"
+  },
+  "loading": "加载中...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+  "errorLoadingData": "数据加载失败",
+  "@errorLoadingData": {
+    "description": "Error message when data fails to load"
+  },
+  "search": "搜索",
+  "@search": {
+    "description": "Search label"
+  },
+  "share": "分享",
+  "@share": {
+    "description": "Share button text"
+  },
+  "addToFavorites": "添加到收藏",
+  "@addToFavorites": {
+    "description": "Add to favorites button tooltip"
+  },
+  "removeFromFavorites": "从收藏中移除",
+  "@removeFromFavorites": {
+    "description": "Remove from favorites button tooltip"
+  },
+  "yearsAgo": "{years}前",
+  "@yearsAgo": {
+    "description": "Time format showing years ago",
+    "placeholders": {
+      "years": {
+        "type": "String",
+        "example": "138亿"
+      }
+    }
+  },
+  "billionYears": "{value}亿年",
+  "@billionYears": {
+    "description": "Format for billion years",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "13.8"
+      }
+    }
+  },
+  "millionYears": "{value}百万年",
+  "@millionYears": {
+    "description": "Format for million years",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "4.5"
+      }
+    }
+  },
+  "thousandYears": "{value}千年",
+  "@thousandYears": {
+    "description": "Format for thousand years",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "10"
+      }
+    }
+  },
+  "years": "年",
+  "@years": {
+    "description": "The word 'Years'"
+  },
+  "unknown": "未知",
+  "@unknown": {
+    "description": "Unknown value placeholder"
+  },
+  "unknownAgo": "未知时间",
+  "@unknownAgo": {
+    "description": "Unknown time ago"
+  }
+}

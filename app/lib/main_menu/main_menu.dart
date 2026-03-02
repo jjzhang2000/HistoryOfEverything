@@ -16,6 +16,7 @@ import "package:timeline/search_manager.dart";
 import "package:timeline/colors.dart";
 import "package:timeline/timeline/timeline_entry.dart";
 import 'package:timeline/timeline/timeline_widget.dart';
+import 'package:timeline/l10n/app_localizations.dart';
 
 /// The Main Page of the Timeline App. 
 /// 
@@ -201,7 +202,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                     color: Colors.black.withValues(alpha: 0.65)),
               ),
               Text(
-                "Your Favorites",
+                AppLocalizations.of(context)?.yourFavorites ?? "Your Favorites",
                 style: TextStyle(
                     fontSize: 20.0,
                     fontFamily: "RobotoMedium",
@@ -224,7 +225,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                     color: Colors.black.withValues(alpha: 0.65)),
               ),
               Text(
-                "Share",
+                AppLocalizations.of(context)?.share ?? "Share",
                 style: TextStyle(
                     fontSize: 20.0,
                     fontFamily: "RobotoMedium",
@@ -254,7 +255,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                       color: Colors.black.withValues(alpha: 0.65)),
                 ),
                 Text(
-                  "About",
+                  AppLocalizations.of(context)?.about ?? "About",
                   style: TextStyle(
                       fontSize: 20.0,
                       fontFamily: "RobotoMedium",
@@ -294,7 +295,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                                             child: Image.asset(
                                                 "assets/twoDimensions_logo.png",
                                                 height: 10.0))),
-                                    Text("The History of Everything",
+                                    Text(AppLocalizations.of(context)?.historyOfEverything ?? "The History of Everything",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: darkText.withValues(

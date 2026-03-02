@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:timeline/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:timeline/l10n/app_localizations.dart';
 
 /// This widget is visible when opening the about page from the [MainMenuWidget].
 /// 
@@ -40,7 +41,7 @@ class AboutPage extends StatelessWidget {
           ),
           titleSpacing:
               9.0, // Note that the icon has 20 on the right due to its padding, so we add 10 to get our desired 29
-          title: Text("About",
+          title: Text(AppLocalizations.of(context)?.about ?? "About",
               textAlign: TextAlign.left,
               style: TextStyle(
                   fontFamily: "RobotoMedium",

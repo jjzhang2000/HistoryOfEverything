@@ -1,0 +1,103 @@
+{
+  "@@locale": "en",
+  "appTitle": "History & Future of Everything",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "historyOfEverything": "The History of Everything",
+  "@historyOfEverything": {
+    "description": "Main title displayed in the menu"
+  },
+  "yourFavorites": "Your Favorites",
+  "@yourFavorites": {
+    "description": "Title for the favorites page"
+  },
+  "noFavoritesYet": "You haven't favorited anything yet.",
+  "@noFavoritesYet": {
+    "description": "Message shown when user has no favorites"
+  },
+  "about": "About",
+  "@about": {
+    "description": "Title for the about page"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Button text for retrying an action"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+  "errorLoadingData": "Error loading data",
+  "@errorLoadingData": {
+    "description": "Error message when data fails to load"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search label"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "Share button text"
+  },
+  "addToFavorites": "Add to favorites",
+  "@addToFavorites": {
+    "description": "Add to favorites button tooltip"
+  },
+  "removeFromFavorites": "Remove from favorites",
+  "@removeFromFavorites": {
+    "description": "Remove from favorites button tooltip"
+  },
+  "yearsAgo": "{years} Ago",
+  "@yearsAgo": {
+    "description": "Time format showing years ago",
+    "placeholders": {
+      "years": {
+        "type": "String",
+        "example": "13.8 Billion"
+      }
+    }
+  },
+  "billionYears": "{value} Billion Years",
+  "@billionYears": {
+    "description": "Format for billion years",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "13.8"
+      }
+    }
+  },
+  "millionYears": "{value} Million Years",
+  "@millionYears": {
+    "description": "Format for million years",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "4.5"
+      }
+    }
+  },
+  "thousandYears": "{value} Thousand Years",
+  "@thousandYears": {
+    "description": "Format for thousand years",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "10"
+      }
+    }
+  },
+  "years": "Years",
+  "@years": {
+    "description": "The word 'Years'"
+  },
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Unknown value placeholder"
+  },
+  "unknownAgo": "Unknown Ago",
+  "@unknownAgo": {
+    "description": "Unknown time ago"
+  }
+}

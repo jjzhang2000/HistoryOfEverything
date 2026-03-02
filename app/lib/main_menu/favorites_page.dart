@@ -7,6 +7,7 @@ import 'package:timeline/main_menu/menu_data.dart';
 import 'package:timeline/main_menu/thumbnail_detail_widget.dart';
 import 'package:timeline/timeline/timeline_entry.dart';
 import 'package:timeline/timeline/timeline_widget.dart';
+import 'package:timeline/l10n/app_localizations.dart';
 
 /// This widget is displayed when tapping on the Favorites button in the [MainMenuWidget].
 /// 
@@ -63,7 +64,7 @@ class FavoritesPage extends StatelessWidget {
           ),
           titleSpacing:
               9.0, /// Note that the icon has 20 on the right due to its padding, so we add 10 to get our desired 29
-          title: Text("Your Favorites",
+          title: Text(AppLocalizations.of(context)?.yourFavorites ?? "Your Favorites",
               style: TextStyle(
                   fontFamily: "RobotoMedium",
                   fontSize: 20.0,
@@ -93,7 +94,7 @@ class FavoritesPage extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.only(bottom: 21),
                             width: 250,
-                            child: Text("You haven’t favorited anything yet.",
+                            child: Text(AppLocalizations.of(context)?.noFavoritesYet ?? "You haven't favorited anything yet.",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: "RobotoMedium",
