@@ -5,9 +5,7 @@
 2. [项目作用与功能](#项目作用与功能)
 3. [代码结构](#代码结构)
 4. [代码调用关系详解](#代码调用关系详解)
-5. [存在的问题](#存在的问题)
-6. [改进规划建议](#改进规划建议)
-7. [其他发现与建议](#其他发现与建议)
+5. [下一步改善建议](#下一步改善建议)
 
 ---
 
@@ -19,12 +17,13 @@
 
 **原始来源**: https://github.com/2d-inc/HistoryOfEverything.git
 
-**当前状态**: 正在进行从废弃动画库(Flare/Nima)到 Rive 的迁移工作
+**当前状态**: 已完成重大重构和现代化升级
 
 **技术栈**:
 - Flutter SDK (>=3.0.0 <4.0.0)
-- Dart 语言
+- Dart 语言（空安全）
 - Rive 动画库
+- Riverpod 状态管理
 - 其他依赖: flutter_markdown, share_plus, shared_preferences, intl, rxdart, url_launcher
 
 ---
@@ -42,13 +41,13 @@
    - 自定义手势交互（长按、点击、缩放）
 
 2. **事件展示**
-   - 每个历史事件都有动画展示
+   - 每个历史事件都有动画/图片展示
    - 气泡式标签显示事件名称和时间
    - 支持 Markdown 格式的详细文章
 
 3. **搜索功能**
-   - 基于子字符串的快速搜索
-   - 使用 SplayTreeMap 实现高效查询
+   - 基于前缀索引的快速搜索
+   - 支持多词搜索和自动补全
 
 4. **收藏功能**
    - 使用 SharedPreferences 持久化存储
@@ -69,10 +68,10 @@
 
 ```
 app/lib/
-├── main.dart                    # 应用入口
-├── bloc_provider.dart           # 状态管理核心（InheritedWidget）
+├── main.dart                    # 应用入口，集成 Riverpod 和 BlocProvider
+├── bloc_provider.dart           # InheritedWidget 状态管理（向后兼容）
 ├── colors.dart                  # 颜色常量定义
-├── search_manager.dart          # 搜索管理器
+├── search_manager.dart          # 搜索管理器（前缀索引优化）
 │
 ├── animation/                   # 动画模块
 │   ├── animation_exports.dart   # 动画组件导出
@@ -81,16 +80,20 @@ app/lib/
 │   └── static_image_asset.dart        # 静态图片资源
 │
 ├── article/                     # 文章详情模块
-│   ├── article_widget.dart      # 文章页面
+│   ├── article_widget.dart      # 文章页面（含错误处理）
 │   ├── timeline_entry_widget.dart  # 时间线条目渲染
 │   └── controllers/             # 动画控制器（待重新实现）
-│       ├── amelia_controller.dart
-│       ├── flare_interaction_controller.dart
-│       ├── newton_controller.dart
-│       └── nima_interaction_controller.dart
 │
 ├── blocs/                       # BLoC 状态管理
 │   └── favorites_bloc.dart      # 收藏状态管理
+│
+├── providers/                   # Riverpod 状态管理（新增）
+│   └── app_providers.dart       # 全局状态提供者
+│
+├── l10n/                        # 国际化支持（新增）
+│   ├── app_localizations.dart
+│   ├── app_en.arb
+│   └── app_zh.arb
 │
 ├── main_menu/                   # 主菜单模块
 │   ├── main_menu.dart           # 主菜单页面
@@ -105,14 +108,15 @@ app/lib/
 │   └── thumbnail_detail_widget.dart  # 缩略图详情
 │
 └── timeline/                    # 时间线核心模块
-    ├── timeline.dart            # 时间线核心逻辑（已重构）
-    ├── timeline_constants.dart  # 布局常量定义 (新增)
-    ├── timeline_viewport.dart   # 视口状态管理 (新增)
-    ├── timeline_color_manager.dart  # 颜色管理 (新增)
+    ├── timeline.dart            # 核心协调类（已重构）
+    ├── timeline_constants.dart  # 布局常量定义（新增）
+    ├── timeline_viewport.dart   # 视口状态管理（新增）
+    ├── timeline_color_manager.dart  # 颜色管理（新增）
     ├── timeline_entry.dart      # 时间线条目数据模型
-    ├── timeline_widget.dart     # 时间线Widget
+    ├── timeline_widget.dart     # 时间线 Widget
     ├── timeline_render_widget.dart  # 时间线渲染对象
     ├── timeline_utils.dart      # 工具函数
+    ├── resource_cache.dart      # LRU 资源缓存（新增）
     └── ticks.dart               # 时间刻度
 ```
 
@@ -125,73 +129,157 @@ app/lib/
 ```
 main() 
   └── runApp(TimelineApp)
-        └── BlocProvider (InheritedWidget)
-              ├── 初始化 Timeline
-              ├── 初始化 FavoritesBloc
-              ├── 初始化 SearchManager
-              └── MaterialApp
-                    └── MenuPage
-                          └── MainMenuWidget
+        └── ProviderScope (Riverpod)
+              └── _AppInitializer (ConsumerWidget)
+                    │
+                    ├── 初始化状态检查 (appInitStateProvider)
+                    │
+                    ├── 加载中 → CircularProgressIndicator
+                    │
+                    ├── 错误 → 错误提示 + 重试按钮
+                    │
+                    └── 成功 → BlocProvider (向后兼容)
+                          ├── timelineProvider
+                          ├── favoritesBlocProvider
+                          ├── searchManagerProvider
+                          └── MaterialApp
+                                └── MenuPage
+                                      └── MainMenuWidget
 ```
 
-**详细说明**:
+**关键代码** (`main.dart`):
+```dart
+class TimelineApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const ProviderScope(
+      child: _AppInitializer(),
+    );
+  }
+}
 
-1. **`main.dart`** 中的 `main()` 函数是应用入口
-2. `TimelineApp` 是根 Widget，设置设备方向为竖屏
-3. `BlocProvider` 包装整个应用，提供全局状态访问:
-   - 加载 `timeline.json` 数据
-   - 初始化收藏列表
-   - 构建搜索索引
+class _AppInitializer extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final initState = ref.watch(appInitStateProvider);
+    // 根据状态显示不同 UI
+    if (initState == AppInitState.loading) { ... }
+    if (initState == AppInitState.error) { ... }
+    // 成功后使用 BlocProvider
+    return BlocProvider(...);
+  }
+}
+```
 
 ### 2. 状态管理架构
 
 ```
-BlocProvider (InheritedWidget)
+Riverpod (推荐方式)
+    │
+    ├── appInitProvider (AppInitNotifier)
+    │     ├── 加载 timeline.json
+    │     ├── 初始化 Timeline 视口
+    │     ├── 初始化 FavoritesBloc
+    │     └── 初始化 SearchManager
+    │
+    ├── timelineProvider (Timeline)
+    │     ├── viewport (TimelineViewport)
+    │     │     ├── start/end - 视口边界
+    │     │     ├── scrollSimulation - 滚动物理模拟
+    │     │     └── animateViewport() - 视口动画
+    │     │
+    │     └── colorManager (TimelineColorManager)
+    │           ├── backgroundColors
+    │           ├── tickColors
+    │           └── headerColors
+    │
+    ├── favoritesBlocProvider (FavoritesBloc)
+    │     ├── init() - 从 SharedPreferences 加载
+    │     ├── addFavorite()
+    │     ├── removeFavorite()
+    │     └── favoritesListProvider - Riverpod 状态
+    │
+    └── searchManagerProvider (SearchManager)
+          ├── init() - 构建前缀索引
+          ├── performSearch() - 单词搜索
+          └── performMultiWordSearch() - 多词搜索
+
+BlocProvider (向后兼容方式)
     │
     ├── favoritesBloc ──────────► FavoritesBloc
-    │                                   ├── init() - 从SharedPreferences加载
-    │                                   ├── addFavorite()
-    │                                   ├── removeFavorite()
-    │                                   └── _save() - 持久化存储
-    │
-    ├── timeline ───────────────► Timeline (已重构)
-    │                                   ├── loadFromBundle() - 加载JSON
-    │                                   ├── advance() - 动画帧更新
-    │                                   ├── setViewport() - 视口控制
-    │                                   └── onNeedPaint - 重绘回调
-    │                                   │
-    │                                   ├── viewport ──► TimelineViewport
-    │                                   │                     ├── start/end - 视口边界
-    │                                   │                     ├── renderStart/renderEnd - 渲染边界
-    │                                   │                     ├── timeMin/timeMax - 时间范围
-    │                                   │                     ├── setViewport() - 设置视口
-    │                                   │                     ├── clampScroll() - 滚动限制
-    │                                   │                     └── animateViewport() - 视口动画
-    │                                   │
-    │                                   └── colorManager ──► TimelineColorManager
-    │                                                         ├── backgroundColors - 背景颜色
-    │                                                         ├── tickColors - 刻度颜色
-    │                                                         ├── headerColors - 标题颜色
-    │                                                         └── interpolateHeaderColors() - 颜色插值
-    │
+    ├── timeline ───────────────► Timeline
     └── searchManager ──────────► SearchManager
-                                        ├── _fill() - 构建搜索索引
-                                        └── performSearch() - 执行搜索
 ```
 
 **状态访问方式**:
+
 ```dart
-// 获取收藏Bloc
-BlocProvider.favorites(context)
+// Riverpod 方式（推荐）
+final timeline = ref.watch(timelineProvider);
+final favorites = ref.watch(favoritesListProvider);
+final initState = ref.watch(appInitStateProvider);
 
-// 获取时间线
-BlocProvider.getTimeline(context)
-
-// 获取搜索管理器
-BlocProvider.getSearchManager(context)
+// BlocProvider 方式（向后兼容）
+BlocProvider.favorites(context);
+BlocProvider.getTimeline(context);
+BlocProvider.getSearchManager(context);
 ```
 
-### 3. 时间线渲染流程
+### 3. 时间线类结构（已重构）
+
+```
+Timeline (核心协调类)
+    │
+    ├── 静态常量访问 (向后兼容)
+    │     ├── Timeline.lineWidth
+    │     ├── Timeline.lineSpacing
+    │     └── ...
+    │
+    ├── viewport: TimelineViewport
+    │     ├── start, end - 视口边界
+    │     ├── renderStart, renderEnd - 渲染边界
+    │     ├── timeMin, timeMax - 时间范围
+    │     ├── height - 视口高度
+    │     ├── devicePadding - 设备边距
+    │     ├── scrollSimulation - 滚动模拟
+    │     │
+    │     ├── setViewport() - 设置视口
+    │     ├── clampScroll() - 滚动限制
+    │     ├── animateViewport() - 视口动画
+    │     └── advanceScroll() - 推进滚动模拟
+    │
+    ├── colorManager: TimelineColorManager
+    │     ├── backgroundColors: List<TimelineBackgroundColor>
+    │     ├── tickColors: List<TickColors>
+    │     ├── headerColors: List<HeaderColors>
+    │     │
+    │     ├── parseBackgroundColor()
+    │     ├── parseTickColors()
+    │     ├── parseHeaderColors()
+    │     ├── findTickColors()
+    │     ├── interpolateHeaderColors()
+    │     └── updateTickColorPositions()
+    │
+    ├── 资源管理
+    │     ├── _scheduleAssetLoad() - 调度资源加载
+    │     ├── _loadAssetAsync() - 异步加载资源
+    │     └── preloadVisibleAssets() - 预加载可见资源
+    │
+    └── 动画帧调度
+          ├── beginFrame() - 帧回调
+          ├── advance() - 推进动画
+          ├── _advanceItems() - 推进条目
+          └── _advanceAssets() - 推进资源
+
+TimelineConstants (布局常量)
+    ├── lineWidth, lineSpacing, depthOffset
+    ├── edgePadding, moveSpeed, deceleration
+    ├── gutterLeft, gutterLeftExpanded
+    ├── edgeRadius, bubblePadding, bubbleTextHeight
+    └── parallax, assetScreenScale
+```
+
+### 4. 时间线渲染流程
 
 ```
 TimelineWidget (StatefulWidget)
@@ -212,41 +300,53 @@ TimelineWidget (StatefulWidget)
                 └── paint() → 核心渲染逻辑
                       ├── 绘制背景渐变
                       ├── 绘制时间刻度 (Ticks)
-                      ├── 绘制时间线元素 (drawItems)
+                      ├── 绘制时间线元素
                       │     ├── 绘制连接线
                       │     ├── 绘制气泡标签
                       │     └── 递归绘制子元素
-                      ├── 绘制资源动画 (TimelineAsset)
+                      ├── 绘制资源动画/图片
                       ├── 绘制上/下导航箭头
                       └── 绘制收藏侧边栏
 ```
 
-### 4. 动画帧调度机制
+### 5. 资源加载流程（懒加载 + 缓存）
 
 ```
-Timeline.beginFrame()
+Timeline.loadFromBundle()
     │
-    ├── 计算时间增量 (elapsed)
-    │
-    ├── advance() 更新状态
-    │     ├── 更新视口位置
-    │     ├── 更新元素透明度
-    │     ├── 更新标签位置
-    │     ├── 更新资源动画
-    │     └── 返回是否需要继续渲染
-    │
-    ├── onNeedPaint() → markNeedsPaint()
-    │
-    └── SchedulerBinding.scheduleFrameCallback(beginFrame) → 递归调用
+    └── 遍历条目，调度资源加载
+          │
+          └── _scheduleAssetLoad(entry, extension)
+                │
+                └── _loadAssetAsync(entry, extension)
+                      │
+                      ├── .riv 文件
+                      │     └── ResourceLoader.loadRive(filename)
+                      │           └── ResourceCache (LRU 缓存)
+                      │
+                      ├── .flr/.nma 文件 (已废弃)
+                      │     └── 加载 PNG 回退图片
+                      │           └── ResourceLoader.loadImage(path)
+                      │                 └── ResourceCache (LRU 缓存)
+                      │
+                      └── 其他图片
+                            └── ResourceLoader.loadImage(filename)
+                                  └── ResourceCache (LRU 缓存)
+
+ResourceCache (LRU 缓存)
+    ├── 最大内存限制 (50MB)
+    ├── 自动淘汰最少使用的资源
+    ├── 缓存命中率统计
+    └── clear() - 清理缓存
 ```
 
-### 5. 页面导航流程
+### 6. 页面导航流程
 
 ```
 MainMenuWidget
     │
     ├── 搜索模式
-    │     └── SearchWidget → SearchManager.performSearch() → 搜索结果列表
+    │     └── SearchWidget → SearchManager.performSearch() → 搜索结果
     │
     └── 菜单模式
           ├── MenuSection (宇宙/生命/人类历史)
@@ -262,492 +362,116 @@ MainMenuWidget
 TimelineWidget
     └── 点击气泡 → Navigator.push(ArticleWidget)
           └── ArticleWidget
-                ├── TimelineEntryWidget (动画)
+                ├── TimelineEntryWidget (动画/图片)
                 ├── MarkdownBody (文章内容)
                 └── AnimatedFavoriteButton (收藏按钮)
 ```
 
-### 6. 搜索索引构建
-
-```
-SearchManager._fill(entries)
-    │
-    └── 遍历每个 TimelineEntry
-          └── 遍历标签的每个子字符串
-                └── SplayTreeMap[子字符串].add(条目)
-                      └── 时间复杂度: O(n²) 其中 n 是标签长度
-```
-
-**搜索查询**:
-```dart
-performSearch(query)
-    └── SplayTreeMap.containsKey(query.toLowerCase())
-          └── 返回匹配的 Set<TimelineEntry>
-```
-
 ---
 
-## 存在的问题
+## 下一步改善建议
 
-### 1. 动画迁移 ~~不完整~~ 已完成 (✅ 已解决)
+### 1. 动画控制器重构 (高优先级)
 
-**问题描述**: 
-项目正在从 Flare/Nima 动画库迁移到 Rive。
-
-**已完成的迁移工作**:
-- ✅ 实现了 `TimelineRive` 资源类用于存储 Rive 动画数据
-- ✅ 在 `timeline.dart` 中实现了 `.riv` 文件加载逻辑
-- ✅ 在 `VignetteRenderObject` 中实现了 Rive artboard 渲染
-- ✅ 实现了动画帧调度 (`beginFrame` 方法)
-- ✅ 移除了废弃的 Flare/Nima 代码
-
-**已完成工作** (✅ 2026年3月2日更新):
-- ✅ 实现了 Flare/Nima 到 PNG 图片的迁移回退机制
-- ✅ 当加载 `.flr` 或 `.nma` 资产时，自动尝试加载对应的 PNG 图片
-- ✅ 支持多种路径查找策略（资产子目录和根目录）
-- ✅ 如果找不到 PNG，使用透明占位符避免应用崩溃
-- ✅ 保留了对 Rive (.riv) 动画的完整支持
-
-**技术实现**:
-```dart
-// TimelineRive 类定义
-class TimelineRive extends TimelineAnimatedAsset {
-  Artboard? artboard;
-  RiveAnimationController? controller;
-}
-
-// Rive 文件加载 (timeline.dart)
-ByteData data = await rootBundle.load(filename);
-final riveFile = RiveFile.import(data);
-final artboard = riveFile.mainArtboard;
-riveAsset.artboard = artboard;
-
-// 渲染 (timeline_entry_widget.dart)
-if (asset is TimelineRive && asset.artboard != null) {
-  canvas.translate(x, y);
-  artboard.draw(canvas);
-}
-```
-
-### 2. ~~搜索索引性能问题~~ 已解决 (✅ 已优化)
-
-**问题描述**:
-搜索索引构建使用 O(n²) 算法，对于长标签会有性能问题。
-
-**解决方案**:
-改用基于单词的前缀索引策略：
-- 将标签分词（按空格、连字符、下划线等分隔符）
-- 为每个单词的所有前缀建立索引
-- 时间复杂度从 O(n*l²) 降低到 O(n*w*p)
-  - n: 条目数量
-  - w: 每个条目的平均单词数
-  - p: 每个单词的前缀数
-
-**新增功能**:
-- `performSearch()`: 前缀匹配搜索 (O(1) 查询)
-- `performMultiWordSearch()`: 多词 AND 搜索
-- `getSuggestions()`: 自动补全建议
-- `initAsync()`: 异步初始化，避免阻塞 UI
-- `isInitialized`: 初始化状态检查
-- `indexedWordCount/indexedPrefixCount`: 索引统计信息
-
-**代码位置**: `app/lib/search_manager.dart`
-
-### 3. ~~错误处理不完善~~ 已解决 (✅ 已优化)
-
-**问题描述**:
-部分异步操作缺少完善的错误处理。
-
-**解决方案**:
-
-1. **BlocProvider 初始化错误处理**:
-   - 添加 `AppInitState` 枚举 (loading/success/error)
-   - 使用 `ValueNotifier` 管理初始化状态和错误消息
-   - 支持重试初始化 (`retryInitialization()`)
-   - 静态访问器: `getInitState()`, `getErrorMessage()`, `retry()`
-
-2. **ArticleWidget 错误处理**:
-   - 添加 `_loadError` 和 `_errorMessage` 状态变量
-   - 使用 try-catch 包装异步加载
-   - 显示用户友好的错误提示 UI
-   - 添加加载状态指示器
-
-**代码位置**: 
-- `app/lib/bloc_provider.dart`
-- `app/lib/article/article_widget.dart`
-
-### 4. ~~空安全问题~~ 已解决 (✅ 已优化)
-
-**问题描述**:
-部分代码使用了 `!` 强制解包，可能在运行时抛出空指针异常。
-
-**解决方案**:
-
-1. **timeline.dart**:
-   - 使用安全访问 `?.` 替代强制解包 `!`
-   - 添加合理的默认值 (如 `?? 0.0`)
-
-2. **bloc_provider.dart**:
-   - 使用局部变量存储可空值
-   - 提供默认值处理
-
-3. **favorites_bloc.dart**:
-   - 使用 `(a.start ?? 0).compareTo(b.start ?? 0)` 替代强制解包
-
-4. **menu_data.dart**:
-   - 使用局部变量 `entryStart` 存储可空值
-   - 使用 `?? entryStart` 提供默认值
-
-**代码位置**: 
-- `app/lib/timeline/timeline.dart`
-- `app/lib/bloc_provider.dart`
-- `app/lib/blocs/favorites_bloc.dart`
-- `app/lib/main_menu/menu_data.dart`
-
-### 5. ~~代码注释语言混杂~~ 已解决 (✅ 已优化)
-
-**问题描述**:
-代码注释混合使用英文和中文，不够统一。
-
-**解决方案**:
-将所有中文注释翻译为英语，统一代码注释语言。
-
-**修改文件**:
-- `animation_placeholder.dart`
-- `static_image_asset.dart`
-- `animation_exports.dart`
-- `animated_favorite_button.dart`
-
-### 6. ~~未使用的代码和变量~~ 已解决 (✅ 已优化)
-
-**问题描述**:
-存在未使用的字段和变量。
-
-**解决方案**:
-
-1. **timeline_entry_widget.dart**:
-   - 移除未使用的 `package:rive/rive.dart` 导入
-   - 移除未使用的 `_firstUpdate` 字段
-   - 移除未使用的 `_renderOffset` 字段
-   - 简化 `updateActor()` 方法（移除无用代码）
-
-2. **timeline.dart**:
-   - 将 `print()` 替换为 `debugPrint()`（生产代码最佳实践）
-
-**验证结果**:
-```
-flutter analyze
-No issues found! (ran in 2.9s)
-```
-
-### 7. ~~Timeline 类过于庞大~~ 已解决 (✅ 已重构)
-
-**问题描述**:
-`Timeline` 类（约 600 行）承担了太多职责：
-- 数据加载
-- 视口管理
-- 动画调度
-- 资源管理
-- 颜色管理
-
-**解决方案**:
-将 `Timeline` 类拆分为多个单一职责的类：
-
-1. **`TimelineConstants`** (新增) - 布局常量定义
-   - 线条宽度和间距 (`lineWidth`, `lineSpacing`, `depthOffset`)
-   - 边缘和移动参数 (`edgePadding`, `moveSpeed`, `deceleration`)
-   - 侧边栏宽度 (`gutterLeft`, `gutterLeftExpanded`)
-   - 气泡尺寸 (`edgeRadius`, `bubblePadding`, `bubbleTextHeight`)
-   - 资源渲染参数 (`parallax`, `assetScreenScale`)
-
-2. **`TimelineViewport`** (新增) - 视口状态管理
-   - 视口边界 (`start`, `end`, `renderStart`, `renderEnd`)
-   - 时间范围 (`timeMin`, `timeMax`)
-   - 滚动物理模拟 (`ScrollPhysics`, `Simulation`)
-   - 视口动画 (`animateViewport()`, `clampScroll()`)
-
-3. **`TimelineColorManager`** (新增) - 颜色管理
-   - 背景颜色列表 (`backgroundColors`)
-   - 刻度颜色列表 (`tickColors`)
-   - 标题颜色列表 (`headerColors`)
-   - 颜色解析和插值方法
-
-4. **`Timeline`** (重构) - 核心协调类
-   - 组合使用 `TimelineViewport` 和 `TimelineColorManager`
-   - 保持向后兼容性，通过静态 getter 暴露常量
-   - 专注于数据加载和动画调度
-
-**代码位置**: 
-- `app/lib/timeline/timeline_constants.dart`
-- `app/lib/timeline/timeline_viewport.dart`
-- `app/lib/timeline/timeline_color_manager.dart`
-- `app/lib/timeline/timeline.dart`
-
-**验证结果**:
-```
-flutter analyze
-No issues found! (ran in 2.9s)
-```
-
----
-
-## 改进规划建议
-
-### 短期改进 (1-2周)
-
-1. **完成 Rive 动画迁移**
-   ```dart
-   // 重新实现 TimelineRive 资产渲染
-   class TimelineRive extends TimelineAnimatedAsset {
-     Artboard? artboard;
-     RiveAnimationController? controller;
-     
-     void advance(double elapsed) {
-       artboard?.advance(elapsed);
-     }
-   }
-   ```
-
-2. **~~完善错误处理~~ 已完成** (✅ 已优化)
-   - ✅ 添加 BlocProvider 初始化错误处理
-   - ✅ 添加 ArticleWidget 错误处理和加载状态
-   - ✅ 显示用户友好的错误提示 UI
-
-3. **~~修复空安全问题~~ 已完成** (✅ 已优化)
-   - ✅ 使用安全调用操作符 `?.`
-   - ✅ 提供合理的默认值
-   - ✅ 移除所有强制解包 `!`
-
-### 中期改进 (1-2月)
-
-1. **~~重构搜索索引~~ 已完成** (✅ 已优化)
-   - 使用基于单词的前缀索引策略
-   - 支持多词搜索和自动补全
-
-2. **~~拆分 Timeline 类~~ 已完成** (✅ 已重构)
-   ```
-   Timeline (核心协调)
-   ├── TimelineConstants (布局常量)
-   ├── TimelineViewport (视口状态管理)
-   └── TimelineColorManager (颜色管理)
-   ```
-
-3. **添加单元测试**
-   - 搜索管理器测试
-   - 收藏功能测试
-   - 时间线渲染测试
-
-### 长期改进 (3-6月)
-
-1. **~~状态管理升级~~ 已完成** (✅ 已升级)
-
-**问题描述**:
-使用手写 InheritedWidget 进行状态管理，缺乏现代化状态管理工具的优势。
-
-**解决方案**:
-引入 Riverpod 状态管理库，实现更优雅的状态管理：
-
-1. **添加 Riverpod 依赖**:
-   ```yaml
-   # pubspec.yaml
-   flutter_riverpod: ^2.4.9
-   ```
-
-2. **创建 Riverpod Providers** (`app/lib/providers/app_providers.dart`):
-   - `platformProvider` - 平台目标提供者
-   - `timelineProvider` - Timeline 实例提供者
-   - `favoritesBlocProvider` - FavoritesBloc 实例提供者
-   - `searchManagerProvider` - SearchManager 实例提供者
-   - `appInitProvider` - 应用初始化状态通知器
-   - `favoritesListProvider` - 收藏列表状态通知器
-
-3. **状态类定义**:
-   - `AppInitState` 枚举 (loading/success/error)
-   - `AppInitData` 数据类 (包含状态、错误消息、条目列表)
-   - `AppInitNotifier` 状态通知器 (处理初始化逻辑)
-
-4. **便捷提供者**:
-   - `appInitStateProvider` - 初始化状态
-   - `appErrorMessageProvider` - 错误消息
-   - `timelineEntriesProvider` - 时间线条目列表
-   - `isInitializedProvider` - 初始化完成标志
-
-5. **更新 main.dart**:
-   - 使用 `ProviderScope` 包装应用
-   - 创建 `_AppInitializer` ConsumerWidget 处理初始化状态
-   - 保持 `BlocProvider` 向后兼容
-
-6. **优势**:
-   - 更清晰的状态管理代码
-   - 自动资源清理
-   - 更好的可测试性
-   - 支持状态组合和依赖注入
-   - 保持与现有代码的向后兼容
-
-2. **~~性能优化~~ 已完成** (✅ 已优化)
-
-**问题描述**:
-资源在启动时全部加载，导致内存占用高和启动延迟。
-
-**解决方案**:
-实现资源懒加载和 LRU 缓存策略：
-
-1. **创建资源缓存管理器** (`app/lib/timeline/resource_cache.dart`):
-   - `ResourceCache` 类 - LRU 缓存实现
-   - 最大内存限制 (默认 50MB)
-   - 自动淘汰最少使用的资源
-   - 缓存命中率统计
-
-2. **ResourceLoader 工具类**:
-   - `loadImage()` - 图片缓存加载
-   - `loadRive()` - Rive 动画缓存加载
-   - `preloadCriticalAssets()` - 关键资源预加载
-
-3. **懒加载支持**:
-   - `TimelineEntry` 添加 `assetFilename`, `assetMap`, `isAssetLoadScheduled` 字段
-   - `_scheduleAssetLoad()` - 异步调度资源加载
-   - `_loadAssetAsync()` - 异步加载资源
-   - `preloadVisibleAssets()` - 预加载可见资源
-
-4. **优势**:
-   - 减少启动时间
-   - 降低内存占用
-   - 按需加载资源
-   - 避免重复加载
-   - 自动内存管理
-
-3. **国际化支持**
-   - 提取所有字符串资源
-   - 添加多语言支持
-
----
-
-## 其他发现与建议
-
-### 1. 资源文件组织
-
-**当前问题**:
-资源文件夹命名不统一，有些使用下划线（`Big_Bang`），有些使用空格（`Darwin 2`）。
+**现状**:
+`article/controllers/` 目录下仍有废弃的 Flare/Nima 控制器文件。
 
 **建议**:
-统一使用小写下划线命名法，例如 `big_bang`、`darwin_v2`。
+- 移除废弃的控制器文件
+- 使用 Rive 状态机重新实现交互动画
+- 为特定条目（牛顿、阿梅利亚等）创建新的 Rive 动画
 
-### 2. 测试覆盖率
+### 2. 测试覆盖率提升 (中优先级)
 
-**当前状态**:
-测试目录存在但测试用例较少。
-
-**建议**:
-```
-test/
-├── blocs/
-│   └── favorites_bloc_test.dart  ✓ 存在
-├── models/
-├── timeline/
-│   └── timeline_test.dart
-└── widget_test.dart  ✓ 存在
-```
-
-需要添加更多测试用例。
-
-### 3. ~~文档完善~~ 已解决 (✅ 已优化)
-
-**问题描述**:
-项目缺乏完善的文档。
-
-**解决方案**:
-添加了以下文档文件：
-
-1. **`CONTRIBUTING.md`** - 贡献指南
-   - 代码行为准则
-   - 开发环境设置说明
-   - 项目结构说明
-   - 编码标准
-   - 提交规范 (Conventional Commits)
-   - Pull Request 流程
-   - Issue 报告指南
-
-2. **`CHANGELOG.md`** - 变更日志
-   - 遵循 [Keep a Changelog](https://keepachangelog.com/) 格式
-   - 记录所有重要变更
-   - 版本历史摘要
-   - 迁移指南（Flare/Nima 到 Rive，Riverpod 状态管理）
-
-**文档位置**:
-- `CONTRIBUTING.md` (项目根目录)
-- `CHANGELOG.md` (项目根目录)
-
-### 4. CI/CD 配置
+**现状**:
+测试用例较少，需要增加测试覆盖。
 
 **建议添加**:
-- GitHub Actions 工作流
-- 自动化测试
-- 代码质量检查（lint）
-- 自动化发布流程
+```
+test/
+├── unit/
+│   ├── search_manager_test.dart      # 搜索功能测试
+│   ├── timeline_viewport_test.dart   # 视口逻辑测试
+│   ├── resource_cache_test.dart      # 缓存测试
+│   └── favorites_bloc_test.dart      # 收藏功能测试
+│
+├── widget/
+│   ├── timeline_widget_test.dart     # 时间线渲染测试
+│   └── article_widget_test.dart      # 文章页面测试
+│
+└── integration/
+    └── app_test.dart                 # 端到端测试
+```
 
-### 5. 依赖版本管理
+### 3. CI/CD 配置 (中优先级)
 
-**当前状态**:
-依赖版本固定较好，但需要定期更新。
-
-**建议**:
+**建议添加**:
 ```yaml
-# 使用范围版本约束
-dependencies:
-  rive: ^0.13.20  # ✓ 良好
-  flutter_markdown: ^0.6.18  # ✓ 良好
+# .github/workflows/main.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
 ```
 
-### 6. 代码风格
+### 4. 国际化完善 (低优先级)
+
+**现状**:
+已添加中英文国际化支持框架，但大部分内容未翻译。
 
 **建议**:
-- 使用 `dart format` 统一格式化
-- 启用更多 lint 规则
-- 移除 `// ignore` 注释并修复问题
+- 提取所有 UI 字符串到 ARB 文件
+- 翻译文章内容（考虑使用占位符或外部链接）
+- 添加语言切换设置
 
-### 7. ~~平台适配~~ 已解决 (✅ 已优化)
+### 5. 资源文件规范化 (低优先级)
 
-**问题描述**:
-`main_menu.dart` 中使用了 `Platform.isAndroid` 判断，Web 平台不支持。
+**现状**:
+资源文件夹命名不统一（`Big_Bang` vs `Darwin 2`）。
 
-**解决方案**:
-在 `main_menu.dart` 中添加了 `kIsWeb` 检查，避免 Web 平台使用 `Platform.isAndroid` 导致异常：
+**建议**:
+- 统一使用小写下划线命名（`big_bang`, `darwin_v2`）
+- 更新 `timeline.json` 中的路径引用
+- 清理未使用的资源
 
-```dart
-import "package:flutter/foundation.dart" show kIsWeb;
-import "dart:io" show Platform;
+### 6. 性能监控 (低优先级)
 
-// 分享链接逻辑
-onPressed: () {
-  String url;
-  if (kIsWeb) {
-    url = "https://play.google.com/store/apps/details?id=com.twodimensions.timeline";
-  } else if (Platform.isAndroid) {
-    url = "https://play.google.com/store/apps/details?id=com.twodimensions.timeline";
-  } else {
-    url = "itms://itunes.apple.com/us/app/apple-store/id1441257460?mt=8";
-  }
-  Share.share("Check out The History of Everything! $url");
-},
-```
-
-**优势
-
-**主要优点**:
-- 清晰的代码结构
-- 自定义渲染实现高性能时间线
-- 完整的功能实现
-
-**主要风险**:
-- 动画库迁移不完整可能导致功能缺失
-- 搜索性能问题可能影响大数据量下的用户体验
-- 缺乏完善的错误处理可能影响应用稳定性
-
-**建议优先级**:
-1. 🔴 高优先级：完成 Rive 动画迁移
-2. 🟡 中优先级：完善错误处理、优化搜索性能
-3. 🟢 低优先级：代码风格统一、文档完善
+**建议添加**:
+- Flutter DevTools 集成
+- 帧率监控
+- 内存使用追踪
+- 用户行为分析
 
 ---
 
-*报告生成日期: 2026年2月28日*
+## 项目当前状态总结
+
+**已完成的改进**:
+- ✅ Riverpod 状态管理集成
+- ✅ Timeline 类重构（单一职责原则）
+- ✅ 搜索性能优化（前缀索引）
+- ✅ 空安全问题修复
+- ✅ 错误处理完善
+- ✅ 资源懒加载和 LRU 缓存
+- ✅ Web 平台兼容性
+- ✅ 代码注释统一为英语
+- ✅ 未使用代码清理
+- ✅ 项目文档完善（CONTRIBUTING.md, CHANGELOG.md）
+
+**待改进项**:
+- 🔴 动画控制器重构（移除废弃代码）
+- 🟡 测试覆盖率提升
+- 🟡 CI/CD 配置
+- 🟢 国际化内容翻译
+- 🟢 资源文件规范化
+
+---
+
+*报告更新日期: 2026年3月2日*
