@@ -1,10 +1,10 @@
 import "dart:async";
-import "dart:io";
-
+import "package:flutter/foundation.dart" show kIsWeb;
 import "package:flutter/material.dart";
 import "package:share_plus/share_plus.dart";
 import 'package:timeline/bloc_provider.dart';
 import 'package:timeline/main_menu/collapsible.dart';
+import "dart:io" show Platform;
 
 import "package:timeline/main_menu/menu_data.dart";
 import "package:timeline/main_menu/search_widget.dart";
@@ -210,8 +210,17 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
               )
             ])))
         ..add(TextButton(
-            onPressed: () => Share.share(
-                "Check out The History of Everything! ${Platform.isAndroid ? "https://play.google.com/store/apps/details?id=com.twodimensions.timeline" : "itms://itunes.apple.com/us/app/apple-store/id1441257460?mt=8"}"),
+            onPressed: () {
+              String url;
+              if (kIsWeb) {
+                url = "https://play.google.com/store/apps/details?id=com.twodimensions.timeline";
+              } else if (Platform.isAndroid) {
+                url = "https://play.google.com/store/apps/details?id=com.twodimensions.timeline";
+              } else {
+                url = "itms://itunes.apple.com/us/app/apple-store/id1441257460?mt=8";
+              }
+              Share.share("Check out The History of Everything! $url");
+            },
             style: TextButton.styleFrom(
               backgroundColor: Colors.transparent,
             ),
