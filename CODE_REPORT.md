@@ -539,9 +539,50 @@ No issues found! (ran in 2.9s)
 
 ### 长期改进 (3-6月)
 
-1. **状态管理升级**
-   - 考虑使用 Riverpod 或 Bloc 库替代手写 InheritedWidget
-   - 添加状态持久化
+1. **~~状态管理升级~~ 已完成** (✅ 已升级)
+
+**问题描述**:
+使用手写 InheritedWidget 进行状态管理，缺乏现代化状态管理工具的优势。
+
+**解决方案**:
+引入 Riverpod 状态管理库，实现更优雅的状态管理：
+
+1. **添加 Riverpod 依赖**:
+   ```yaml
+   # pubspec.yaml
+   flutter_riverpod: ^2.4.9
+   ```
+
+2. **创建 Riverpod Providers** (`app/lib/providers/app_providers.dart`):
+   - `platformProvider` - 平台目标提供者
+   - `timelineProvider` - Timeline 实例提供者
+   - `favoritesBlocProvider` - FavoritesBloc 实例提供者
+   - `searchManagerProvider` - SearchManager 实例提供者
+   - `appInitProvider` - 应用初始化状态通知器
+   - `favoritesListProvider` - 收藏列表状态通知器
+
+3. **状态类定义**:
+   - `AppInitState` 枚举 (loading/success/error)
+   - `AppInitData` 数据类 (包含状态、错误消息、条目列表)
+   - `AppInitNotifier` 状态通知器 (处理初始化逻辑)
+
+4. **便捷提供者**:
+   - `appInitStateProvider` - 初始化状态
+   - `appErrorMessageProvider` - 错误消息
+   - `timelineEntriesProvider` - 时间线条目列表
+   - `isInitializedProvider` - 初始化完成标志
+
+5. **更新 main.dart**:
+   - 使用 `ProviderScope` 包装应用
+   - 创建 `_AppInitializer` ConsumerWidget 处理初始化状态
+   - 保持 `BlocProvider` 向后兼容
+
+6. **优势**:
+   - 更清晰的状态管理代码
+   - 自动资源清理
+   - 更好的可测试性
+   - 支持状态组合和依赖注入
+   - 保持与现有代码的向后兼容
 
 2. **性能优化**
    - 实现资源懒加载
