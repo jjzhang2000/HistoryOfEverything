@@ -421,6 +421,53 @@ TimelineWidget
                 └── AnimatedFavoriteButton (收藏按钮)
 ```
 
+### 8. 测试架构
+
+```
+test/
+├── search_manager_test.dart          # 搜索功能测试
+│   └── 测试内容: 单例模式、前缀匹配、多词搜索、建议功能
+│
+├── widget_test.dart                  # 基础 Widget 测试
+│
+├── article/
+│   └── article_widget_test.dart      # 文章页面测试
+│
+├── blocs/
+│   └── favorites_bloc_test.dart      # 收藏功能测试
+│   └── 测试内容: 初始化、添加/删除收藏、持久化、排序
+│
+├── models/
+│   └── timeline_entry_test.dart      # 时间线条目模型测试
+│
+├── providers/
+│   └── app_providers_test.dart       # Riverpod 状态管理测试
+│   └── 测试内容: AppInitData、FavoritesListNotifier、各 Provider
+│
+└── timeline/
+    ├── resource_cache_test.dart      # LRU 缓存测试
+    │   └── 测试内容: 缓存操作、LRU淘汰、命中率统计
+    │
+    ├── timeline_color_manager_test.dart  # 颜色管理测试
+    │
+    ├── timeline_test.dart            # 时间线核心测试
+    │   └── 测试内容: 视口设置、缩放计算、回调函数
+    │
+    └── timeline_viewport_test.dart   # 视口逻辑测试
+        └── 测试内容: 视口边界、平台行为、滚动模拟
+```
+
+**测试覆盖的关键功能**:
+
+| 模块 | 测试重点 |
+|------|---------|
+| SearchManager | 前缀索引、大小写不敏感、多词搜索、建议限制 |
+| FavoritesBloc | SharedPreferences持久化、排序、去重 |
+| TimelineViewport | 视口边界、平台兼容、滚动限制 |
+| ResourceCache | LRU淘汰策略、并发加载、缓存统计 |
+| Timeline | 视口动画、缩放计算、回调触发 |
+| AppProviders | 状态初始化、Provider创建、状态更新 |
+
 ---
 
 ## 下一步改善建议
@@ -435,32 +482,7 @@ TimelineWidget
 - 使用 Rive 状态机重新实现交互动画
 - 为特定条目（牛顿、阿梅利亚等）创建新的 Rive 动画
 
-### 2. 测试覆盖率 ✅ 已完成
-
-**现状**:
-已建立完整的测试体系，覆盖核心功能模块。
-
-**已有测试**:
-```
-test/
-├── search_manager_test.dart          # 搜索功能测试（前缀匹配、多词搜索）
-├── widget_test.dart                  # 基础 Widget 测试
-├── article/
-│   └── article_widget_test.dart      # 文章页面测试
-├── blocs/
-│   └── favorites_bloc_test.dart      # 收藏功能测试（添加/删除/持久化）
-├── models/
-│   └── timeline_entry_test.dart      # 时间线条目模型测试
-├── providers/
-│   └── app_providers_test.dart       # Riverpod 状态管理测试
-└── timeline/
-    ├── resource_cache_test.dart      # LRU 缓存测试
-    ├── timeline_color_manager_test.dart  # 颜色管理测试
-    ├── timeline_test.dart            # 时间线核心测试
-    └── timeline_viewport_test.dart   # 视口逻辑测试
-```
-
-### 3. 资源文件规范化 (低优先级)
+### 2. 资源文件规范化 (低优先级)
 
 **现状**:
 资源文件夹命名不统一（`Big_Bang` vs `Darwin 2`）。
