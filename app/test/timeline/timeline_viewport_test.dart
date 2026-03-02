@@ -53,10 +53,7 @@ void main() {
         viewport.timeMin = 0.0;
         viewport.timeMax = 2000.0;
 
-        bool callbackCalled = false;
-        viewport.clampScroll(() {
-          callbackCalled = true;
-        });
+        viewport.clampScroll(() {});
 
         // Start should be within bounds
         expect(viewport.start, greaterThanOrEqualTo(viewport.timeMin));

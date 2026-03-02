@@ -1,8 +1,12 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
 
 /// The translations for Chinese (`zh`).
 class AppLocalizationsZh extends AppLocalizations {
-  AppLocalizationsZh() : super('zh');
+  AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
   String get appTitle => '万物的历史与未来';
@@ -41,16 +45,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get removeFromFavorites => '从收藏中移除';
 
   @override
-  String yearsAgo(String years) => '$years前';
+  String yearsAgo(String years) {
+    return '$years前';
+  }
 
   @override
-  String billionYears(String value) => '$value亿年';
+  String billionYears(String value) {
+    return '$value亿年';
+  }
 
   @override
-  String millionYears(String value) => '$value百万年';
+  String millionYears(String value) {
+    return '$value百万年';
+  }
 
   @override
-  String thousandYears(String value) => '$value千年';
+  String thousandYears(String value) {
+    return '$value千年';
+  }
 
   @override
   String get years => '年';

@@ -6,7 +6,6 @@ import 'package:timeline/bloc_provider.dart' hide AppInitState;
 import 'package:timeline/colors.dart';
 import 'package:timeline/main_menu/main_menu.dart';
 import 'package:timeline/providers/app_providers.dart';
-import 'package:timeline/search_manager.dart';
 import 'package:timeline/l10n/app_localizations.dart';
 
 /// The app is wrapped by a [ProviderScope] for Riverpod state management
@@ -17,8 +16,8 @@ class TimelineApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    return ProviderScope(
-      child: const _AppInitializer(),
+    return const ProviderScope(
+      child: _AppInitializer(),
     );
   }
 }

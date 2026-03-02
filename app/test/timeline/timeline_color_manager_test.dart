@@ -185,8 +185,7 @@ void main() {
 
     group('interpolateHeaderColors', () {
       test('should return false when no header colors', () {
-        final result = colorManager.interpolateHeaderColors(0.016);
-        expect(result, isFalse);
+        expect(colorManager.interpolateHeaderColors(0.016), isFalse);
       });
 
       test('should set header colors when available', () {
@@ -198,7 +197,7 @@ void main() {
         
         colorManager.headerColors.add(hc);
 
-        final result = colorManager.interpolateHeaderColors(0.016);
+        colorManager.interpolateHeaderColors(0.016);
 
         expect(colorManager.headerTextColor, equals(Colors.white));
         expect(colorManager.headerBackgroundColor, equals(Colors.black));

@@ -1,8 +1,12 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
 
 /// The translations for English (`en`).
 class AppLocalizationsEn extends AppLocalizations {
-  AppLocalizationsEn() : super('en');
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
   String get appTitle => 'History & Future of Everything';
@@ -41,16 +45,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get removeFromFavorites => 'Remove from favorites';
 
   @override
-  String yearsAgo(String years) => '$years Ago';
+  String yearsAgo(String years) {
+    return '$years Ago';
+  }
 
   @override
-  String billionYears(String value) => '$value Billion Years';
+  String billionYears(String value) {
+    return '$value Billion Years';
+  }
 
   @override
-  String millionYears(String value) => '$value Million Years';
+  String millionYears(String value) {
+    return '$value Million Years';
+  }
 
   @override
-  String thousandYears(String value) => '$value Thousand Years';
+  String thousandYears(String value) {
+    return '$value Thousand Years';
+  }
 
   @override
   String get years => 'Years';
