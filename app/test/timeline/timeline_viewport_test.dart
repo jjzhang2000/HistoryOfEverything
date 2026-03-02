@@ -19,8 +19,9 @@ void main() {
       expect(viewport.end, equals(0.0));
       expect(viewport.renderStart, equals(0.0));
       expect(viewport.renderEnd, equals(0.0));
-      expect(viewport.timeMin, equals(double.infinity));
-      expect(viewport.timeMax, equals(-double.infinity));
+      // timeMin and timeMax are initialized to 0.0 and updated when entries are loaded
+      expect(viewport.timeMin, equals(0.0));
+      expect(viewport.timeMax, equals(0.0));
     });
 
     group('setViewport', () {
