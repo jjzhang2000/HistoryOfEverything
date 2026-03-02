@@ -56,6 +56,10 @@
 5. **分享功能**
    - 支持分享应用到应用商店链接
 
+6. **国际化支持**
+   - 支持英语和中文 (zh-CN)
+   - 完整的 UI 字符串翻译
+
 ### 支持平台
 - Android
 - iOS
@@ -87,36 +91,38 @@ app/lib/
 ├── blocs/                       # BLoC 状态管理
 │   └── favorites_bloc.dart      # 收藏状态管理
 │
-├── providers/                   # Riverpod 状态管理（新增）
+├── providers/                   # Riverpod 状态管理
 │   └── app_providers.dart       # 全局状态提供者
 │
-├── l10n/                        # 国际化支持（新增）
-│   ├── app_localizations.dart
-│   ├── app_en.arb
-│   └── app_zh.arb
+├── l10n/                        # 国际化支持
+│   ├── app_localizations.dart   # 国际化基类和委托
+│   ├── app_localizations_en.dart # 英文翻译实现
+│   ├── app_localizations_zh.dart # 中文翻译实现
+│   ├── app_en.arb               # 英文 ARB 资源文件
+│   └── app_zh.arb               # 中文 ARB 资源文件
 │
 ├── main_menu/                   # 主菜单模块
-│   ├── main_menu.dart           # 主菜单页面
+│   ├── main_menu.dart           # 主菜单页面（支持国际化）
 │   ├── menu_data.dart           # 菜单数据模型
 │   ├── menu_vignette.dart       # 菜单小部件
 │   ├── main_menu_section.dart   # 菜单分区
 │   ├── collapsible.dart         # 可折叠组件
-│   ├── favorites_page.dart      # 收藏页面
-│   ├── about_page.dart          # 关于页面
+│   ├── favorites_page.dart      # 收藏页面（支持国际化）
+│   ├── about_page.dart          # 关于页面（支持国际化）
 │   ├── search_widget.dart       # 搜索组件
 │   ├── thumbnail.dart           # 缩略图
 │   └── thumbnail_detail_widget.dart  # 缩略图详情
 │
 └── timeline/                    # 时间线核心模块
-    ├── timeline.dart            # 核心协调类（已重构）
-    ├── timeline_constants.dart  # 布局常量定义（新增）
-    ├── timeline_viewport.dart   # 视口状态管理（新增）
-    ├── timeline_color_manager.dart  # 颜色管理（新增）
+    ├── timeline.dart            # 核心协调类
+    ├── timeline_constants.dart  # 布局常量定义
+    ├── timeline_viewport.dart   # 视口状态管理
+    ├── timeline_color_manager.dart  # 颜色管理
     ├── timeline_entry.dart      # 时间线条目数据模型
     ├── timeline_widget.dart     # 时间线 Widget
     ├── timeline_render_widget.dart  # 时间线渲染对象
     ├── timeline_utils.dart      # 工具函数
-    ├── resource_cache.dart      # LRU 资源缓存（新增）
+    ├── resource_cache.dart      # LRU 资源缓存
     └── ticks.dart               # 时间刻度
 ```
 
@@ -136,13 +142,15 @@ main()
                     │
                     ├── 加载中 → CircularProgressIndicator
                     │
-                    ├── 错误 → 错误提示 + 重试按钮
+                    ├── 错误 → 错误提示 + 重试按钮（国际化文本）
                     │
                     └── 成功 → BlocProvider (向后兼容)
                           ├── timelineProvider
                           ├── favoritesBlocProvider
                           ├── searchManagerProvider
                           └── MaterialApp
+                                ├── localizationsDelegates (国际化委托)
+                                ├── supportedLocales (支持的语言)
                                 └── MenuPage
                                       └── MainMenuWidget
 ```
@@ -164,7 +172,11 @@ class _AppInitializer extends ConsumerWidget {
     final initState = ref.watch(appInitStateProvider);
     // 根据状态显示不同 UI
     if (initState == AppInitState.loading) { ... }
-    if (initState == AppInitState.error) { ... }
+    if (initState == AppInitState.error) { 
+      // 使用国际化文本
+      final l10n = AppLocalizations.of(context);
+      return ErrorWidget(message: l10n?.errorLoadingData);
+    }
     // 成功后使用 BlocProvider
     return BlocProvider(...);
   }
@@ -225,7 +237,49 @@ BlocProvider.getTimeline(context);
 BlocProvider.getSearchManager(context);
 ```
 
-### 3. 时间线类结构（已重构）
+### 3. 国际化架构
+
+```
+MaterialApp
+    │
+    ├── localizationsDelegates
+    │     ├── AppLocalizations.delegate (应用自定义翻译)
+    │     ├── GlobalMaterialLocalizations.delegate
+    │     ├── GlobalWidgetsLocalizations.delegate
+    │     └── GlobalCupertinoLocalizations.delegate
+    │
+    ├── supportedLocales
+    │     ├── Locale('en') - 英语
+    │     └── Locale('zh') - 中文
+    │
+    └── 翻译访问
+          └── AppLocalizations.of(context)
+                ├── appTitle - 应用标题
+                ├── historyOfEverything - 主标题
+                ├── yourFavorites - 收藏标题
+                ├── about - 关于
+                ├── search - 搜索
+                ├── share - 分享
+                ├── loading - 加载中
+                ├── errorLoadingData - 错误消息
+                ├── yearsAgo(years) - 时间格式化
+                └── ... 更多翻译字符串
+```
+
+**国际化使用示例**:
+
+```dart
+// 在 Widget 中获取翻译
+final l10n = AppLocalizations.of(context);
+
+// 简单字符串
+Text(l10n?.historyOfEverything ?? "The History of Everything")
+
+// 带参数的字符串
+Text(l10n?.yearsAgo("13.8 Billion") ?? "13.8 Billion Ago")
+```
+
+### 4. 时间线类结构
 
 ```
 Timeline (核心协调类)
@@ -279,7 +333,7 @@ TimelineConstants (布局常量)
     └── parallax, assetScreenScale
 ```
 
-### 4. 时间线渲染流程
+### 5. 时间线渲染流程
 
 ```
 TimelineWidget (StatefulWidget)
@@ -309,7 +363,7 @@ TimelineWidget (StatefulWidget)
                       └── 绘制收藏侧边栏
 ```
 
-### 5. 资源加载流程（懒加载 + 缓存）
+### 6. 资源加载流程（懒加载 + 缓存）
 
 ```
 Timeline.loadFromBundle()
@@ -340,10 +394,10 @@ ResourceCache (LRU 缓存)
     └── clear() - 清理缓存
 ```
 
-### 6. 页面导航流程
+### 7. 页面导航流程
 
 ```
-MainMenuWidget
+MainMenuWidget (支持国际化)
     │
     ├── 搜索模式
     │     └── SearchWidget → SearchManager.performSearch() → 搜索结果
@@ -353,10 +407,10 @@ MainMenuWidget
           │     └── navigateToTimeline()
           │           └── Navigator.push(TimelineWidget)
           │
-          ├── FavoritesPage
+          ├── FavoritesPage (支持国际化)
           │     └── Navigator.push(FavoritesPage)
           │
-          └── AboutPage
+          └── AboutPage (支持国际化)
                 └── Navigator.push(AboutPage)
 
 TimelineWidget
@@ -403,37 +457,7 @@ test/
     └── app_test.dart                 # 端到端测试
 ```
 
-### 3. CI/CD 配置 (中优先级) ✅ 已完成
-
-**已添加** `.github/workflows/main.yml`:
-- **analyze job**: 代码静态分析
-- **test job**: 运行测试并上传覆盖率到 Codecov
-- **build-android job**: 构建 Android APK
-- **build-web job**: 构建 Web 版本
-- **build-windows job**: 构建 Windows 版本
-- 支持 `main`, `master`, `Upgrade` 分支
-
-### 4. 国际化完善 ✅ 已完成
-
-**现状**:
-已完成中英文国际化支持，包含 25+ 翻译字符串。
-
-**已完成**:
-- ✅ 提取 UI 字符串到 ARB 文件 (app_en.arb, app_zh.arb)
-- ✅ 更新 main_menu.dart 使用国际化
-- ✅ 更新 about_page.dart 使用国际化
-- ✅ 支持语言：英语、中文 (zh-CN)
-- ✅ 添加时间格式化字符串（年前、亿年、百万年等）
-
-**翻译字符串包括**:
-- 应用标题和菜单项
-- 收藏页面文本
-- 关于页面描述
-- 搜索相关文本
-- 错误消息
-- 按钮文本
-
-### 5. 资源文件规范化 (低优先级)
+### 3. 资源文件规范化 (低优先级)
 
 **现状**:
 资源文件夹命名不统一（`Big_Bang` vs `Darwin 2`）。
@@ -443,7 +467,7 @@ test/
 - 更新 `timeline.json` 中的路径引用
 - 清理未使用的资源
 
-### 6. 性能监控 (低优先级)
+### 4. 性能监控 (低优先级)
 
 **建议添加**:
 - Flutter DevTools 集成
@@ -467,12 +491,13 @@ test/
 - ✅ 未使用代码清理
 - ✅ 项目文档完善（CONTRIBUTING.md, CHANGELOG.md）
 - ✅ CI/CD 配置（GitHub Actions）
+- ✅ 国际化支持（英语、中文）
 
 **待改进项**:
 - 🔴 动画控制器重构（移除废弃代码）
 - 🟡 测试覆盖率提升
-- 🟢 国际化内容翻译
 - 🟢 资源文件规范化
+- 🟢 性能监控集成
 
 ---
 
