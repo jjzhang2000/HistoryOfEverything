@@ -105,7 +105,10 @@ app/lib/
 │   └── thumbnail_detail_widget.dart  # 缩略图详情
 │
 └── timeline/                    # 时间线核心模块
-    ├── timeline.dart            # 时间线核心逻辑
+    ├── timeline.dart            # 时间线核心逻辑（已重构）
+    ├── timeline_constants.dart  # 布局常量定义 (新增)
+    ├── timeline_viewport.dart   # 视口状态管理 (新增)
+    ├── timeline_color_manager.dart  # 颜色管理 (新增)
     ├── timeline_entry.dart      # 时间线条目数据模型
     ├── timeline_widget.dart     # 时间线Widget
     ├── timeline_render_widget.dart  # 时间线渲染对象
@@ -151,11 +154,25 @@ BlocProvider (InheritedWidget)
     │                                   ├── removeFavorite()
     │                                   └── _save() - 持久化存储
     │
-    ├── timeline ───────────────► Timeline
+    ├── timeline ───────────────► Timeline (已重构)
     │                                   ├── loadFromBundle() - 加载JSON
     │                                   ├── advance() - 动画帧更新
     │                                   ├── setViewport() - 视口控制
     │                                   └── onNeedPaint - 重绘回调
+    │                                   │
+    │                                   ├── viewport ──► TimelineViewport
+    │                                   │                     ├── start/end - 视口边界
+    │                                   │                     ├── renderStart/renderEnd - 渲染边界
+    │                                   │                     ├── timeMin/timeMax - 时间范围
+    │                                   │                     ├── setViewport() - 设置视口
+    │                                   │                     ├── clampScroll() - 滚动限制
+    │                                   │                     └── animateViewport() - 视口动画
+    │                                   │
+    │                                   └── colorManager ──► TimelineColorManager
+    │                                                         ├── backgroundColors - 背景颜色
+    │                                                         ├── tickColors - 刻度颜色
+    │                                                         ├── headerColors - 标题颜色
+    │                                                         └── interpolateHeaderColors() - 颜色插值
     │
     └── searchManager ──────────► SearchManager
                                         ├── _fill() - 构建搜索索引
@@ -420,7 +437,7 @@ flutter analyze
 No issues found! (ran in 2.9s)
 ```
 
-### 7. Timeline 类过于庞大 (架构问题)
+### 7. ~~Timeline 类过于庞大~~ 已解决 (✅ 已重构)
 
 **问题描述**:
 `Timeline` 类（约 600 行）承担了太多职责：
@@ -430,7 +447,44 @@ No issues found! (ran in 2.9s)
 - 资源管理
 - 颜色管理
 
-**建议**: 拆分为多个单一职责的类。
+**解决方案**:
+将 `Timeline` 类拆分为多个单一职责的类：
+
+1. **`TimelineConstants`** (新增) - 布局常量定义
+   - 线条宽度和间距 (`lineWidth`, `lineSpacing`, `depthOffset`)
+   - 边缘和移动参数 (`edgePadding`, `moveSpeed`, `deceleration`)
+   - 侧边栏宽度 (`gutterLeft`, `gutterLeftExpanded`)
+   - 气泡尺寸 (`edgeRadius`, `bubblePadding`, `bubbleTextHeight`)
+   - 资源渲染参数 (`parallax`, `assetScreenScale`)
+
+2. **`TimelineViewport`** (新增) - 视口状态管理
+   - 视口边界 (`start`, `end`, `renderStart`, `renderEnd`)
+   - 时间范围 (`timeMin`, `timeMax`)
+   - 滚动物理模拟 (`ScrollPhysics`, `Simulation`)
+   - 视口动画 (`animateViewport()`, `clampScroll()`)
+
+3. **`TimelineColorManager`** (新增) - 颜色管理
+   - 背景颜色列表 (`backgroundColors`)
+   - 刻度颜色列表 (`tickColors`)
+   - 标题颜色列表 (`headerColors`)
+   - 颜色解析和插值方法
+
+4. **`Timeline`** (重构) - 核心协调类
+   - 组合使用 `TimelineViewport` 和 `TimelineColorManager`
+   - 保持向后兼容性，通过静态 getter 暴露常量
+   - 专注于数据加载和动画调度
+
+**代码位置**: 
+- `app/lib/timeline/timeline_constants.dart`
+- `app/lib/timeline/timeline_viewport.dart`
+- `app/lib/timeline/timeline_color_manager.dart`
+- `app/lib/timeline/timeline.dart`
+
+**验证结果**:
+```
+flutter analyze
+No issues found! (ran in 2.9s)
+```
 
 ---
 
@@ -462,28 +516,15 @@ No issues found! (ran in 2.9s)
 
 ### 中期改进 (1-2月)
 
-1. **重构搜索索引**
-   ```dart
-   // 使用 Trie 树优化搜索
-   class SearchTrie {
-     final Map<String, Set<TimelineEntry>> _index = {};
-     
-     void insert(String word, TimelineEntry entry) {
-       // O(n) 构建，n 为单词长度
-     }
-     
-     Set<TimelineEntry> search(String prefix) {
-       // O(m) 查询，m 为前缀长度
-     }
-   }
-   ```
+1. **~~重构搜索索引~~ 已完成** (✅ 已优化)
+   - 使用基于单词的前缀索引策略
+   - 支持多词搜索和自动补全
 
-2. **拆分 Timeline 类**
+2. **~~拆分 Timeline 类~~ 已完成** (✅ 已重构)
    ```
-   Timeline (核心)
-   ├── TimelineViewportManager (视口管理)
-   ├── TimelineAnimationScheduler (动画调度)
-   ├── TimelineAssetManager (资源管理)
+   Timeline (核心协调)
+   ├── TimelineConstants (布局常量)
+   ├── TimelineViewport (视口状态管理)
    └── TimelineColorManager (颜色管理)
    ```
 
