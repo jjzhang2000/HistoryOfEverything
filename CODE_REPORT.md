@@ -384,30 +384,40 @@ if (asset is TimelineRive && asset.artboard != null) {
 - `app/lib/blocs/favorites_bloc.dart`
 - `app/lib/main_menu/menu_data.dart`
 
-### 5. 代码注释语言混杂 (低优先级)
+### 5. ~~代码注释语言混杂~~ 已解决 (✅ 已优化)
 
 **问题描述**:
 代码注释混合使用英文和中文，不够统一。
 
-**示例**:
-```dart
-/// 动画组件导出文件
-/// 使用示例:
-// English comments in timeline.dart
-/// Some aptly named constants for properly aligning the Timeline view.
-```
+**解决方案**:
+将所有中文注释翻译为英语，统一代码注释语言。
 
-### 6. 未使用的代码和变量 (低优先级)
+**修改文件**:
+- `animation_placeholder.dart`
+- `static_image_asset.dart`
+- `animation_exports.dart`
+- `animated_favorite_button.dart`
+
+### 6. ~~未使用的代码和变量~~ 已解决 (✅ 已优化)
 
 **问题描述**:
 存在未使用的字段和变量。
 
-**示例 - `timeline_entry_widget.dart`**:
-```dart
-// ignore: unused_field
-bool _firstUpdate = true;
-// ignore: unused_field
-Offset? _renderOffset;
+**解决方案**:
+
+1. **timeline_entry_widget.dart**:
+   - 移除未使用的 `package:rive/rive.dart` 导入
+   - 移除未使用的 `_firstUpdate` 字段
+   - 移除未使用的 `_renderOffset` 字段
+   - 简化 `updateActor()` 方法（移除无用代码）
+
+2. **timeline.dart**:
+   - 将 `print()` 替换为 `debugPrint()`（生产代码最佳实践）
+
+**验证结果**:
+```
+flutter analyze
+No issues found! (ran in 2.9s)
 ```
 
 ### 7. Timeline 类过于庞大 (架构问题)

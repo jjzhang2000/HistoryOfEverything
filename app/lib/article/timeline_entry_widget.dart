@@ -2,7 +2,6 @@ import "dart:ui" as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:rive/rive.dart';
 import 'package:timeline/timeline/timeline_entry.dart';
 
 /// This widget renders a single [TimelineEntry]. It relies on a [LeafRenderObjectWidget] 
@@ -52,20 +51,17 @@ class VignetteRenderObject extends RenderBox {
   static const BoxFit fit = BoxFit.contain;
   
   bool _isActive = false;
-  bool _firstUpdate = true;
   bool _isFrameScheduled = false;
   double _lastFrameTime = 0.0;
   Offset? interactOffset;
-  Offset? _renderOffset;
 
   TimelineEntry? _timelineEntry;
 
   /// Called whenever a new [TimelineEntry] is being set.
   /// Rive animations are already loaded in TimelineRive, so no additional setup needed here.
-  updateActor() {
+  void updateActor() {
     // Rive animations are managed by TimelineRive class
     // The artboard is already initialized in timeline.dart
-    _firstUpdate = true;
   }
 
   /// Uses the [SchedulerBinding] to trigger a new paint for this widget.
@@ -86,7 +82,6 @@ class VignetteRenderObject extends RenderBox {
       return;
     }
     _timelineEntry = value;
-    _firstUpdate = true;
     updateActor();
     updateRendering();
   }
@@ -132,7 +127,6 @@ class VignetteRenderObject extends RenderBox {
   void paint(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
     TimelineAsset? asset = _timelineEntry?.asset;
-    _renderOffset = offset;
 
     /// Don't paint if not needed.
     if (_timelineEntry == null || asset == null) {

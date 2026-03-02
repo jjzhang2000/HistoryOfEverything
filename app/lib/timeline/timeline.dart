@@ -523,7 +523,7 @@ class Timeline {
     }
     return allEntries;
     } catch (e) {
-      print('Error loading timeline from bundle: $e');
+      debugPrint('Error loading timeline from bundle: $e');
       // Return empty list on error
       return <TimelineEntry>[];
     }
