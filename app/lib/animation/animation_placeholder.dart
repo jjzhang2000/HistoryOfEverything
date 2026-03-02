@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'static_image_asset.dart';
 
-/// 动画占位组件，用于替代原来的 Flare/Nima 动画
-/// 显示渐变背景或静态图标
+/// Animation placeholder widget used to replace original Flare/Nima animations
+/// Displays gradient background or static icon
 class AnimationPlaceholder extends StatelessWidget {
   final String? assetName;
   final double width;
@@ -23,7 +23,7 @@ class AnimationPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 尝试获取静态图片路径
+    // Try to get static image path
     String? imagePath = StaticImageAsset.getPath(assetName);
 
     if (useStaticImage && imagePath != null) {
@@ -33,18 +33,18 @@ class AnimationPlaceholder extends StatelessWidget {
         height: height,
         fit: fit,
         errorBuilder: (context, error, stackTrace) {
-          // 如果图片加载失败，显示占位符
+          // If image fails to load, show placeholder
           return _buildPlaceholder();
         },
       );
     }
 
-    // 返回原来的占位符
+    // Return the default placeholder
     return _buildPlaceholder();
   }
 
   Widget _buildPlaceholder() {
-    // 根据 asset 名称返回不同的占位符
+    // Return different placeholder based on asset name
     IconData iconData = _getIconForAsset(assetName);
     Color color = _getColorForAsset(assetName);
 
@@ -124,7 +124,7 @@ class AnimationPlaceholder extends StatelessWidget {
   }
 }
 
-/// 用于时间线条目的小动画占位符
+/// Small animation placeholder for timeline entries
 class TimelineAssetPlaceholder extends StatelessWidget {
   final String? filename;
   final double opacity;

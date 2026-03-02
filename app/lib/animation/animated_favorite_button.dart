@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 替代原 FlareActor 收藏按钮的 Flutter 原生动画实现
+/// Flutter native animation implementation replacing the original FlareActor favorite button
 class AnimatedFavoriteButton extends StatefulWidget {
   final bool isFavorite;
   final VoidCallback onTap;
@@ -70,7 +70,7 @@ class _AnimatedFavoriteButtonState extends State<AnimatedFavoriteButton>
   }
 }
 
-/// 简单的心形图标按钮（无动画，用于工具栏）
+/// Simple heart icon button (no animation, used for toolbar)
 class HeartIconButton extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;

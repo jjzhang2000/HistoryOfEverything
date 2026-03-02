@@ -1,17 +1,17 @@
-/// 动画组件导出文件
+/// Animation component export file
 /// 
-/// 使用示例:
+/// Usage example:
 /// ```dart
 /// import 'package:timeline/animation/animation_exports.dart';
 /// 
-/// // 收藏按钮
+/// // Favorite button
 /// AnimatedFavoriteButton(
 ///   isFavorite: true,
 ///   onTap: () { /* ... */ },
 ///   color: Colors.red,
 /// )
 /// 
-/// // 动画占位符
+/// // Animation placeholder
 /// AnimationPlaceholder(
 ///   assetName: 'dinosaurs.flr',
 ///   width: 100,

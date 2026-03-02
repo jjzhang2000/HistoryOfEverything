@@ -1,10 +1,10 @@
-/// 将动画资源文件 (.flr/.nma) 映射到对应的静态图片路径
-/// 用于在动画无法加载时显示静态图片作为回退
+/// Maps animation asset files (.flr/.nma) to corresponding static image paths
+/// Used to display static images as fallback when animations cannot be loaded
 class StaticImageAsset {
-  /// 动画资源文件名到静态图片路径的映射表
-  /// 键名统一使用小写以便不区分大小写查询
+  /// Mapping table from animation asset filename to static image path
+  /// Keys are lowercase for case-insensitive lookup
   static final Map<String, String> _assetMap = {
-    // .flr 文件映射
+    // .flr file mappings
     'dinosaurs.flr': 'assets/Dinosaurs/Dinosaurs.png',
     'trex.flr': 'assets/Dinosaurs/Dinosaurs.png',
     'sun.flr': 'assets/Big_Bang/Big_Bang.png',
@@ -18,7 +18,7 @@ class StaticImageAsset {
     'heart_toolbar.flr': 'assets/heart_icon.png',
     'broken heart.flr': 'assets/heart_outline.png',
     
-    // .nma 文件映射
+    // .nma file mappings
     'robot.nma': 'assets/Robot.png',
     'apes.nma': 'assets/Apes/Apes0.png',
     'cells.nma': 'assets/Cells/Cells.png',
@@ -56,30 +56,30 @@ class StaticImageAsset {
     'amelia_earhart.nma': 'assets/Amelia_Earhart/Amelia_Earhart.png',
   };
 
-  /// 根据动画资源文件名获取对应的静态图片路径
+  /// Gets the corresponding static image path for an animation asset filename
   /// 
-  /// [assetName] 动画资源文件名，如 'Dinosaurs.flr' 或 'Robot.nma'
+  /// [assetName] Animation asset filename, e.g. 'Dinosaurs.flr' or 'Robot.nma'
   /// 
-  /// 返回对应的静态图片路径，如果未找到映射则返回 null
+  /// Returns the corresponding static image path, or null if no mapping is found
   /// 
-  /// 示例:
+  /// Example:
   /// ```dart
   /// String? imagePath = StaticImageAsset.getPath('Dinosaurs.flr');
-  /// // 返回: 'assets/Dinosaurs/Dinosaurs.png'
+  /// // Returns: 'assets/Dinosaurs/Dinosaurs.png'
   /// ```
   static String? getPath(String? assetName) {
     if (assetName == null || assetName.isEmpty) {
       return null;
     }
-    // 转换为小写进行不区分大小写的查询
+    // Convert to lowercase for case-insensitive lookup
     return _assetMap[assetName.toLowerCase()];
   }
 
-  /// 检查指定的动画资源是否有对应的静态图片映射
+  /// Checks if the specified animation asset has a corresponding static image mapping
   /// 
-  /// [assetName] 动画资源文件名
+  /// [assetName] Animation asset filename
   /// 
-  /// 返回 true 如果存在映射，否则返回 false
+  /// Returns true if a mapping exists, otherwise false
   static bool hasStaticImage(String? assetName) {
     if (assetName == null || assetName.isEmpty) {
       return false;
@@ -87,9 +87,9 @@ class StaticImageAsset {
     return _assetMap.containsKey(assetName.toLowerCase());
   }
 
-  /// 获取所有已映射的动画资源名称列表
+  /// Gets all mapped animation asset names
   static List<String> get allAssetNames => _assetMap.keys.toList();
 
-  /// 获取所有可用的静态图片路径列表
+  /// Gets all available static image paths
   static List<String> get allImagePaths => _assetMap.values.toList();
 }
